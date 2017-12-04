@@ -98,6 +98,9 @@ void SysTick_Handler(void){
   SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
   SchM_Start();		        /* Start Scheduler Services */
 
+  for(;;)
+	  leds_ToggleBlueBoardLED();
+
   for(;;){
     // Do nothing
   }
