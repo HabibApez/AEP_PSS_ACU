@@ -43,8 +43,8 @@
 
 /* Includes */
 /*============================================================================*/
-#include "C:\My Documents\Continental\IAR\Devs\lib\MCAL\nvic.c"
-#include "C:\My Documents\Continental\IAR\Devs\lib\MCAL\systick.c"
+#include "MCAL\nvic.c"
+#include "MCAL\systick.c"
 
 /* Constants and types */
 /*============================================================================*/

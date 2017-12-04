@@ -47,7 +47,7 @@
 
 /* Includes */
 /*============================================================================*/
-#include "C:\My Documents\Continental\IAR\Devs\lib\MCAL\scg.c"
+#include "MCAL\scg.c"
 
 /* Constants and types */
 /*============================================================================*/
