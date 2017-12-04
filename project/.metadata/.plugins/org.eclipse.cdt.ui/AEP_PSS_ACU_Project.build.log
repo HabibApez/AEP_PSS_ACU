@@ -1,0 +1,12 @@
+15:23:35 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
+make -j4 all 
+Executing target #6 AEP_PSS_ACU_Project.siz
+Invoking: Standard S32DS Print Size
+arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
+   text	   data	    bss	    dec	    hex	filename
+   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
+Finished building: AEP_PSS_ACU_Project.siz
+ 
+
+15:23:40 Build Finished (took 4s.775ms)
+
