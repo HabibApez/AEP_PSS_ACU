@@ -42,8 +42,8 @@
 /* Includes */
 /*============================================================================*/
 #include "SchM_Tasks.h"
-#include "C:\My Documents\Continental\IAR\Devs\lib\APP\buttonsm.c"
-#include "C:\My Documents\Continental\IAR\Devs\lib\APP\windowlifter.c"
+#include "APP\buttonsm.c"
+#include "APP\windowlifter.c"
 
 /* Constants and types  */
 /*============================================================================*/
