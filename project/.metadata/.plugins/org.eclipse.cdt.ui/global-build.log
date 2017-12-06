@@ -1,187 +1,81 @@
-15:13:11 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
+16:42:34 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
 make -j4 all 
 Executing target #6 AEP_PSS_ACU_Project.siz
 Invoking: Standard S32DS Print Size
 arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
    text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
+   6264	     56	   3160	   9480	   2508	AEP_PSS_ACU_Project.elf
 Finished building: AEP_PSS_ACU_Project.siz
  
-15:14:40 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
+16:42:37 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
 make -j4 all 
 Executing target #6 AEP_PSS_ACU_Project.siz
 Invoking: Standard S32DS Print Size
 arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
    text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
+   6264	     56	   3160	   9480	   2508	AEP_PSS_ACU_Project.elf
 Finished building: AEP_PSS_ACU_Project.siz
  
-15:14:50 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
+16:42:49 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
 make -j4 all 
 Executing target #6 AEP_PSS_ACU_Project.siz
 Invoking: Standard S32DS Print Size
 arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
    text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
+   6264	     56	   3160	   9480	   2508	AEP_PSS_ACU_Project.elf
 Finished building: AEP_PSS_ACU_Project.siz
  
-15:16:12 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
+16:42:56 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
 make -j4 all 
 Executing target #6 AEP_PSS_ACU_Project.siz
 Invoking: Standard S32DS Print Size
 arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
    text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
+   6264	     56	   3160	   9480	   2508	AEP_PSS_ACU_Project.elf
 Finished building: AEP_PSS_ACU_Project.siz
  
-15:16:29 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
+16:43:01 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
 make -j4 all 
 Executing target #6 AEP_PSS_ACU_Project.siz
 Invoking: Standard S32DS Print Size
 arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
    text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
+   6264	     56	   3160	   9480	   2508	AEP_PSS_ACU_Project.elf
 Finished building: AEP_PSS_ACU_Project.siz
  
-15:16:41 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
+16:43:09 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
 make -j4 all 
 Executing target #6 AEP_PSS_ACU_Project.siz
 Invoking: Standard S32DS Print Size
 arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
    text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
+   6264	     56	   3160	   9480	   2508	AEP_PSS_ACU_Project.elf
 Finished building: AEP_PSS_ACU_Project.siz
  
-15:16:47 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
+16:43:24 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
 make -j4 all 
 Executing target #6 AEP_PSS_ACU_Project.siz
 Invoking: Standard S32DS Print Size
 arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
    text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
+   6264	     56	   3160	   9480	   2508	AEP_PSS_ACU_Project.elf
 Finished building: AEP_PSS_ACU_Project.siz
  
-15:16:54 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
+16:43:59 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
 make -j4 all 
 Executing target #6 AEP_PSS_ACU_Project.siz
 Invoking: Standard S32DS Print Size
 arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
    text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
+   6264	     56	   3160	   9480	   2508	AEP_PSS_ACU_Project.elf
 Finished building: AEP_PSS_ACU_Project.siz
  
-15:18:16 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
+16:45:25 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
 make -j4 all 
 Executing target #6 AEP_PSS_ACU_Project.siz
 Invoking: Standard S32DS Print Size
 arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
    text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
-Finished building: AEP_PSS_ACU_Project.siz
- 
-15:18:21 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
-make -j4 all 
-Executing target #6 AEP_PSS_ACU_Project.siz
-Invoking: Standard S32DS Print Size
-arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
-   text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
-Finished building: AEP_PSS_ACU_Project.siz
- 
-15:18:36 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
-make -j4 all 
-Executing target #6 AEP_PSS_ACU_Project.siz
-Invoking: Standard S32DS Print Size
-arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
-   text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
-Finished building: AEP_PSS_ACU_Project.siz
- 
-15:18:55 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
-make -j4 all 
-Executing target #6 AEP_PSS_ACU_Project.siz
-Invoking: Standard S32DS Print Size
-arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
-   text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
-Finished building: AEP_PSS_ACU_Project.siz
- 
-15:19:05 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
-make -j4 all 
-Executing target #6 AEP_PSS_ACU_Project.siz
-Invoking: Standard S32DS Print Size
-arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
-   text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
-Finished building: AEP_PSS_ACU_Project.siz
- 
-15:19:48 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
-make -j4 all 
-Executing target #6 AEP_PSS_ACU_Project.siz
-Invoking: Standard S32DS Print Size
-arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
-   text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
-Finished building: AEP_PSS_ACU_Project.siz
- 
-15:22:35 **** Clean-only build of configuration Debug for project AEP_PSS_ACU_Project ****
-make -j4 clean 
-rm -rf ./*/*.d ./*/*/*.d  ./*/*.o ./*/*/*.o   "AEP_PSS_ACU_Project.siz"   "AEP_PSS_ACU_Project.elf" 
- 
-15:22:38 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
-make -j4 all 
-Building file: ../Project_Settings/Startup_Code/startup.c
-Building file: ../Project_Settings/Startup_Code/startup_S32K144.S
-Building file: ../Project_Settings/Startup_Code/system_S32K144.c
-Executing target #1 ../Project_Settings/Startup_Code/startup.c
-Executing target #3 ../Project_Settings/Startup_Code/system_S32K144.c
-Executing target #2 ../Project_Settings/Startup_Code/startup_S32K144.S
-Invoking: Standard S32DS C Compiler
-Invoking: Standard S32DS C Compiler
-Building file: ../src/main.c
-arm-none-eabi-gcc "@Project_Settings/Startup_Code/startup.args" -MMD -MP -MF"Project_Settings/Startup_Code/startup.d" -MT"Project_Settings/Startup_Code/startup.o" -c -o "Project_Settings/Startup_Code/startup.o" "../Project_Settings/Startup_Code/startup.c"
-Invoking: Standard S32DS Assembler
-arm-none-eabi-gcc "@Project_Settings/Startup_Code/startup_S32K144.args" -c -o "Project_Settings/Startup_Code/startup_S32K144.o" "../Project_Settings/Startup_Code/startup_S32K144.S"
-arm-none-eabi-gcc "@Project_Settings/Startup_Code/system_S32K144.args" -MMD -MP -MF"Project_Settings/Startup_Code/system_S32K144.d" -MT"Project_Settings/Startup_Code/system_S32K144.o" -c -o "Project_Settings/Startup_Code/system_S32K144.o" "../Project_Settings/Startup_Code/system_S32K144.c"
-Executing target #4 ../src/main.c
-Invoking: Standard S32DS C Compiler
-arm-none-eabi-gcc "@src/main.args" -MMD -MP -MF"src/main.d" -MT"src/main.o" -c -o "src/main.o" "../src/main.c"
-Finished building: ../Project_Settings/Startup_Code/startup_S32K144.S
- 
-Finished building: ../Project_Settings/Startup_Code/system_S32K144.c
- 
-Finished building: ../Project_Settings/Startup_Code/startup.c
- 
-Finished building: ../src/main.c
- 
-Building target: AEP_PSS_ACU_Project.elf
-Executing target #5 AEP_PSS_ACU_Project.elf
-Invoking: Standard S32DS C Linker
-arm-none-eabi-gcc -o "AEP_PSS_ACU_Project.elf" "@AEP_PSS_ACU_Project.args"   
-Finished building target: AEP_PSS_ACU_Project.elf
- 
-Executing target #6 AEP_PSS_ACU_Project.siz
-Invoking: Standard S32DS Print Size
-arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
-   text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
-Finished building: AEP_PSS_ACU_Project.siz
- 
-15:22:49 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
-make -j4 all 
-Executing target #6 AEP_PSS_ACU_Project.siz
-Invoking: Standard S32DS Print Size
-arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
-   text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
-Finished building: AEP_PSS_ACU_Project.siz
- 
-15:23:35 **** Incremental Build of configuration Debug for project AEP_PSS_ACU_Project ****
-make -j4 all 
-Executing target #6 AEP_PSS_ACU_Project.siz
-Invoking: Standard S32DS Print Size
-arm-none-eabi-size --format=berkeley  AEP_PSS_ACU_Project.elf 
-   text	   data	    bss	    dec	    hex	filename
-   6260	     56	   3160	   9476	   2504	AEP_PSS_ACU_Project.elf
+   6264	     56	   3160	   9480	   2508	AEP_PSS_ACU_Project.elf
 Finished building: AEP_PSS_ACU_Project.siz
  

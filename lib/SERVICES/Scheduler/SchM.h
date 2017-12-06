@@ -43,7 +43,7 @@
 
 /* Includes */
 /*============================================================================*/
-#include "C:\My Documents\Continental\IAR\Devs\lib\Common\Std_Types.h"
+#include "Common\Std_Types.h"
 #include "SchM_Types.h"
 
 /* Constants and types */

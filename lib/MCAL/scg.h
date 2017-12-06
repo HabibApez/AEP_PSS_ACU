@@ -46,7 +46,7 @@
 
 /* Includes */
 /*============================================================================*/
-#include "C:\My Documents\Continental\IAR\Devs\lib\MCAL\wdt.c"
+#include "MCAL\wdt.c"
 
 /* Constants and types */
 /*============================================================================*/

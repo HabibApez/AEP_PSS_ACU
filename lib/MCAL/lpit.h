@@ -47,7 +47,7 @@
 
 /* Includes */
 /*============================================================================*/
-#include "C:\My Documents\Continental\IAR\Devs\lib\MCAL\pcc.c"
+#include "MCAL\pcc.c"
 
 /* Constants and types */
 /*============================================================================*/

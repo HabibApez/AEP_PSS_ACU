@@ -47,8 +47,8 @@
 
 /* Includes */
 /*============================================================================*/
-#include "C:\My Documents\Continental\IAR\Devs\lib\MCAL\io.c"
-#include "C:\My Documents\Continental\IAR\Devs\lib\MCAL\port.c"
+#include "MCAL\io.c"
+#include "MCAL\port.c"
 
 /* Constants and types */
 /*============================================================================*/

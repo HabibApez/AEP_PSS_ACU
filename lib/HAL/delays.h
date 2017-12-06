@@ -44,7 +44,7 @@
 
 /* Includes */
 /*============================================================================*/
-#include "C:\My Documents\Continental\IAR\Devs\lib\MCAL\lpit.c"
+#include "MCAL\lpit.c"
 
 /* Constants and types */
 /*============================================================================*/
