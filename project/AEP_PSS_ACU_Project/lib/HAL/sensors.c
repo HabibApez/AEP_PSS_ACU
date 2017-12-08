@@ -4,16 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
- * $Revision: version 1$
+ * $Source: sensors.c $
+ * $Revision: version 1 $
  * $Author: Habib Apez $
- * $Date: 2017-11- 22 $
+ * $Date: 2017-12-07 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
-    Main at APP in Scheduler.
-    Window Lifter project main with Scheduler and State Machines.
+/** \sensors.c
+    sensors module file for SK32144 uC. Located at MCAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -30,6 +29,7 @@
 /*============================================================================*/
 /*                    REUSE HISTORY - taken over from                         */
 /*============================================================================*/
+/*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
@@ -37,22 +37,12 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: sensors.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "Common\Std_Types.h"                  // OK
-#include "HAL\clock.c"                         // OK
-#include "HAL\delays.c"                        // OK
-#include "HAL\button.c"                        // OK
-#include "HAL\segmentbar.c"                    // OK
-#include "HAL\leds.c"                          // OK
-#include "HAL\sensors.c"
-#include "SERVICES\Interrupts\interrupts.c"    // OK
-#include "SERVICES\Scheduler\SchM.c"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.c"       // OK
-
+#include "sensors.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -62,82 +52,58 @@
 
 /* Private functions prototypes */
 /*============================================================================*/
-void SysTick_Handler(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
-/**************************************************************
- *  Name                 : SystTick interruption
- *  Description          : Moves the Window upwards
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SysTick_Handler(void){
-  if ( NULL!= GlbSysTickCallback)
-	  GlbSysTickCallback();
-  // leds_ToggleBlueBoardLED();
-}
-
-/**************************************************************
- *  Name                 : main
- *  Description          : Implements the main function
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
- int main(void){
-  clock_InitClock();
-  delays_InitTimer();
-  segmentbar_InitBar();
-  button_InitButtons();
-  leds_InitBoardLeds();
-  leds_InitLeds();
-  sensor_InitSensors();
-
-  T_ULONG SensorReading = 0;
-
-  for(;;){
-    SensorReading = sensor_ReadDriverSeatBeltSensor();
-    if(SensorReading >3750){			/* If result > 3.75V */
-      leds_TurnOnUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading > 2500) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOnDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading >1250) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOnAntipinchLED();
-    }
-    else {
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-
-  }
-
-  for(;;) leds_ToggleBlueBoardLED();
-
-  SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
-  SchM_Start();		        /* Start Scheduler Services */
-
-  for(;;){
-    // Do nothing
-  }
-
-  return 0;
-}
 
 /* Exported functions */
 /*============================================================================*/
+/**************************************************************
+ *  Name                 : sensor_InitSensors
+ *  Description          : Configures the ADC and 3 inputs for the sensors
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void sensor_InitSensors(void){
+  adc_InitADC();
+}
+
+/**************************************************************
+ *  Name                 : sensor_ReadDriverSeatBeltSensor
+ *  Description          : Read the voltage of the Driver Seat Belt Sensor in mv
+ *  Parameters           : [void]
+ *  Return               : T_UWORD
+ *  Critical/explanation : No
+ **************************************************************/
+T_UWORD sensor_ReadDriverSeatBeltSensor(void){
+  return adc_ReadADCChannel(rps_ADC0, DRIVER_SEAT_BELT_SENSOR);
+}
+
+/**************************************************************
+ *  Name                 : sensor_ReadPassengerSeatBeltSensor
+ *  Description          : Read the voltage of the Passenger Seat Belt Sensor in mv
+ *  Parameters           : [void]
+ *  Return               : T_UWORD
+ *  Critical/explanation : No
+ **************************************************************/
+T_UWORD sensor_ReadPassengerSeatBeltSensor(void){
+  return adc_ReadADCChannel(rps_ADC0, PASSENGER_SEAT_BELT_SENSOR);
+}
+
+/**************************************************************
+ *  Name                 : sensor_ReadPassengerSeatSensor
+ *  Description          : Read the voltage of the Passenger Seat Sensor in mv
+ *  Parameters           : [void]
+ *  Return               : T_UWORD
+ *  Critical/explanation : No
+ **************************************************************/
+T_UWORD sensor_ReadPassengerSeatSensor(void){
+  return adc_ReadADCChannel(rps_ADC0, PASSENGER_SEAT_SENSOR);
+}
+
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

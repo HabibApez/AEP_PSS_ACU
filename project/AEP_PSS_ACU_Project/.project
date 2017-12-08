@@ -23,11 +23,4 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>lib</name>
-			<type>2</type>
-			<location>C:/Users/uidn8311/Desktop/AEP_PSS_ACU Repository/AEP_PSS_ACU/lib</location>
-		</link>
-	</linkedResources>
 </projectDescription>
