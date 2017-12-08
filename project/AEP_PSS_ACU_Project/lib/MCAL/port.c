@@ -4,16 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
- * $Revision: version 1$
+ * $Source: port.c $
+ * $Revision: version 3 $
  * $Author: Habib Apez $
- * $Date: 2017-11- 22 $
+ * $Date: 2017-11-08 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
-    Main at APP in Scheduler.
-    Window Lifter project main with Scheduler and State Machines.
+/** \port.c
+    Port Control and Interrupts module file for SK32144 uC. Located at MCAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -30,114 +29,77 @@
 /*============================================================================*/
 /*                    REUSE HISTORY - taken over from                         */
 /*============================================================================*/
-/*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
+/*  DATABASE           |        PROJECT     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          2         |   Naming conventions            */
+/*                     |                    |   and MISRA checked             */
+/* Habib Apez          |          3         |   Function descriptions added   */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: port.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "Common\Std_Types.h"                  // OK
-#include "HAL\clock.c"                         // OK
-#include "HAL\delays.c"                        // OK
-#include "HAL\button.c"                        // OK
-#include "HAL\segmentbar.c"                    // OK
-#include "HAL\leds.c"                          // OK
-#include "HAL\sensors.c"
-#include "SERVICES\Interrupts\interrupts.c"    // OK
-#include "SERVICES\Scheduler\SchM.c"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.c"       // OK
-
+#include "port.h"
 
 /* Constants and types  */
 /*============================================================================*/
 
 /* Variables */
 /*============================================================================*/
+/** Pointers to S_PORT */
+S_PORT *rps_PORTA = PORTA_Address;
+S_PORT *rps_PORTB = PORTB_Address;
+S_PORT *rps_PORTC = PORTC_Address;
+S_PORT *rps_PORTD = PORTD_Address;
+S_PORT *rps_PORTE = PORTE_Address;
 
 /* Private functions prototypes */
 /*============================================================================*/
-void SysTick_Handler(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
-/**************************************************************
- *  Name                 : SystTick interruption
- *  Description          : Moves the Window upwards
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SysTick_Handler(void){
-  if ( NULL!= GlbSysTickCallback)
-	  GlbSysTickCallback();
-  // leds_ToggleBlueBoardLED();
-}
-
-/**************************************************************
- *  Name                 : main
- *  Description          : Implements the main function
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
- int main(void){
-  clock_InitClock();
-  delays_InitTimer();
-  segmentbar_InitBar();
-  button_InitButtons();
-  leds_InitBoardLeds();
-  leds_InitLeds();
-  sensor_InitSensors();
-
-  T_ULONG SensorReading = 0;
-
-  for(;;){
-    SensorReading = sensor_ReadDriverSeatBeltSensor();
-    if(SensorReading >3750){			/* If result > 3.75V */
-      leds_TurnOnUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading > 2500) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOnDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading >1250) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOnAntipinchLED();
-    }
-    else {
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-
-  }
-
-  for(;;) leds_ToggleBlueBoardLED();
-
-  SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
-  SchM_Start();		        /* Start Scheduler Services */
-
-  for(;;){
-    // Do nothing
-  }
-
-  return 0;
-}
 
 /* Exported functions */
 /*============================================================================*/
+/**************************************************************
+ *  Name                 : port_ConfigurePinMode
+ *  Description          : Configures the pin mode of a pin
+ *  Parameters           : [S_PORT *lps_Port, T_UBYTE lub_Pin, T_ULONG lul_Mode]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void port_ConfigurePinMode(S_PORT *lps_Port, T_UBYTE lub_Pin, T_ULONG lul_Mode){
+  lps_Port->raul_PCR[lub_Pin] = lul_Mode;
+}
+
+/**************************************************************
+ *  Name                 : port_GetIntStatusFlag
+ *  Description          : Gets Pin Interrupt Status Flag
+ *  Parameters           : [S_PORT *lps_Port, T_UBYTE lub_Pin]
+ *  Return               : T_UBYTE
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE port_GetIntStatusFlag(S_PORT *lps_Port, T_UBYTE lub_Pin){
+  return lps_Port->raul_PCR[lub_Pin] & (1<<24);
+}
+
+/**************************************************************
+ *  Name                 : ClearIntStatusFlag
+ *  Description          : Clears Pin Interrupt Status Flag
+ *  Parameters           : [S_PORT *lps_Port, T_UBYTE lub_Pin]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void port_ClearIntStatusFlag(S_PORT *lps_Port, T_UBYTE lub_Pin){
+  lps_Port->raul_PCR[lub_Pin] |= (1<<24);
+}
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

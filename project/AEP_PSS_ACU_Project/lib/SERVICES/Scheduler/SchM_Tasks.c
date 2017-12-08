@@ -4,16 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
+ * $Source: SchM_Tasks.c $
  * $Revision: version 1$
  * $Author: Habib Apez $
  * $Date: 2017-11- 22 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
-    Main at APP in Scheduler.
-    Window Lifter project main with Scheduler and State Machines.
+/** \SchM_Tasks.c
+    Source of SchM_Tasks. Located at SERVICES in Scheduler.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -37,22 +36,14 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: SchM_Tasks.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "Common\Std_Types.h"                  // OK
-#include "HAL\clock.c"                         // OK
-#include "HAL\delays.c"                        // OK
-#include "HAL\button.c"                        // OK
-#include "HAL\segmentbar.c"                    // OK
-#include "HAL\leds.c"                          // OK
-#include "HAL\sensors.c"
-#include "SERVICES\Interrupts\interrupts.c"    // OK
-#include "SERVICES\Scheduler\SchM.c"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.c"       // OK
-
+#include "SchM_Tasks.h"
+#include "APP\buttonsm.c"
+#include "APP\windowlifter.c"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -62,82 +53,80 @@
 
 /* Private functions prototypes */
 /*============================================================================*/
-void SysTick_Handler(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
+
+/* Exported functions */
+/*============================================================================*/
 /**************************************************************
- *  Name                 : SystTick interruption
- *  Description          : Moves the Window upwards
+ *  Name                 : SchM_1ms_Task
+ *  Description          : Executes a task each 1ms
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void SysTick_Handler(void){
-  if ( NULL!= GlbSysTickCallback)
-	  GlbSysTickCallback();
+void SchM_1ms_Task(void){   /* Code Task0*/
+  buttonsm_StateMachine();
   // leds_ToggleBlueBoardLED();
 }
 
 /**************************************************************
- *  Name                 : main
- *  Description          : Implements the main function
+ *  Name                 : SchM_2ms_Task
+ *  Description          : Executes a task each 2ms
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
- int main(void){
-  clock_InitClock();
-  delays_InitTimer();
-  segmentbar_InitBar();
-  button_InitButtons();
-  leds_InitBoardLeds();
-  leds_InitLeds();
-  sensor_InitSensors();
-
-  T_ULONG SensorReading = 0;
-
-  for(;;){
-    SensorReading = sensor_ReadDriverSeatBeltSensor();
-    if(SensorReading >3750){			/* If result > 3.75V */
-      leds_TurnOnUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading > 2500) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOnDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading >1250) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOnAntipinchLED();
-    }
-    else {
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-
-  }
-
-  for(;;) leds_ToggleBlueBoardLED();
-
-  SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
-  SchM_Start();		        /* Start Scheduler Services */
-
-  for(;;){
-    // Do nothing
-  }
-
-  return 0;
+void SchM_2ms_Task(void){  /* Code Task1*/
+  windowlifter_StateMachine();
+  // leds_ToggleBlueBoardLED();
 }
 
-/* Exported functions */
-/*============================================================================*/
+/**************************************************************
+ *  Name                 : SchM_4ms_Task
+ *  Description          : Executes a task each 4ms
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void SchM_4ms_Task(void){  /* Code Task2*/
+  
+}
 
+/**************************************************************
+ *  Name                 : SchM_8ms_Task
+ *  Description          : Executes a task each 8ms
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void SchM_8ms_Task(void){  /* Code Task3*/
+  
+}
+
+/**************************************************************
+ *  Name                 : SchM_16ms_Task
+ *  Description          : Executes a task each 16ms
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void SchM_16ms_Task(void){  /* Code Task4*/
+  
+}
+
+/**************************************************************
+ *  Name                 : SchM_32ms_Task
+ *  Description          : Executes a task each 32ms
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void SchM_32ms_Task(void){  /* Code Task5*/
+  // leds_ToggleBlueBoardLED();
+}
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

@@ -4,16 +4,16 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
- * $Revision: version 1$
+ * $Source: nvic.c $
+ * $Revision: version 1 $
  * $Author: Habib Apez $
- * $Date: 2017-11- 22 $
+ * $Date: 2017-11-08 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
-    Main at APP in Scheduler.
-    Window Lifter project main with Scheduler and State Machines.
+/** \nvic.c
+    Nested Vectored Interrupt Controller module file for SK32144 uC. Located at 
+    MCAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -37,107 +37,107 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: nvic.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "Common\Std_Types.h"                  // OK
-#include "HAL\clock.c"                         // OK
-#include "HAL\delays.c"                        // OK
-#include "HAL\button.c"                        // OK
-#include "HAL\segmentbar.c"                    // OK
-#include "HAL\leds.c"                          // OK
-#include "HAL\sensors.c"
-#include "SERVICES\Interrupts\interrupts.c"    // OK
-#include "SERVICES\Scheduler\SchM.c"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.c"       // OK
-
+# include "nvic.h"
 
 /* Constants and types  */
 /*============================================================================*/
 
 /* Variables */
 /*============================================================================*/
+/** Pointers to S_NVIC */
+S_NVIC *rps_NVIC = NVIC_Address;
 
 /* Private functions prototypes */
 /*============================================================================*/
-void SysTick_Handler(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
-/**************************************************************
- *  Name                 : SystTick interruption
- *  Description          : Moves the Window upwards
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SysTick_Handler(void){
-  if ( NULL!= GlbSysTickCallback)
-	  GlbSysTickCallback();
-  // leds_ToggleBlueBoardLED();
-}
-
-/**************************************************************
- *  Name                 : main
- *  Description          : Implements the main function
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
- int main(void){
-  clock_InitClock();
-  delays_InitTimer();
-  segmentbar_InitBar();
-  button_InitButtons();
-  leds_InitBoardLeds();
-  leds_InitLeds();
-  sensor_InitSensors();
-
-  T_ULONG SensorReading = 0;
-
-  for(;;){
-    SensorReading = sensor_ReadDriverSeatBeltSensor();
-    if(SensorReading >3750){			/* If result > 3.75V */
-      leds_TurnOnUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading > 2500) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOnDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading >1250) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOnAntipinchLED();
-    }
-    else {
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-
-  }
-
-  for(;;) leds_ToggleBlueBoardLED();
-
-  SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
-  SchM_Start();		        /* Start Scheduler Services */
-
-  for(;;){
-    // Do nothing
-  }
-
-  return 0;
-}
 
 /* Exported functions */
 /*============================================================================*/
+/**************************************************************
+ *  Name                 : nvic_EnableInterrupt
+ *  Description          : Sets Enable Interrupt Flag
+ *  Parameters           : [IRQn_Type lub_IRQn]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void nvic_EnableInterrupt(IRQn_Type lub_IRQn){
+  rps_NVIC->rul_ISER[lub_IRQn / 32] |= 1 << (lub_IRQn % 32);
+}
+
+/**************************************************************
+ *  Name                 : nvic_DisableInterrupt
+ *  Description          : Clears Enable Interrupt Flag
+ *  Parameters           : [IRQn_Type lub_IRQn]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void nvic_DisableInterrupt(IRQn_Type lub_IRQn){
+  rps_NVIC->rul_ICER[lub_IRQn / 32] |= 1 << (lub_IRQn % 32);
+}
+
+/**************************************************************
+ *  Name                 : nvic_SetPendingInterrupt
+ *  Description          : Sets Pending Interrupt Flag
+ *  Parameters           : [IRQn_Type lub_IRQn]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void nvic_SetPendingInterrupt(IRQn_Type lub_IRQn){
+  rps_NVIC->rul_ISPR[lub_IRQn / 32] |= 1 << (lub_IRQn % 32);
+}
+
+/**************************************************************
+ *  Name                 : nvic_ClearPendingInterrupt
+ *  Description          : Clears Pending Interrupt Flag
+ *  Parameters           : [IRQn_Type lub_IRQn]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void nvic_ClearPendingInterrupt(IRQn_Type lub_IRQn){
+  rps_NVIC->rul_ICPR[lub_IRQn / 32] |= 1 << (lub_IRQn % 32);
+}
+
+/**************************************************************
+ *  Name                 : nvic_GetActiveInterrupt
+ *  Description          : Gets the Active bit Interrupt Flag
+ *  Parameters           : [IRQn_Type lub_IRQn]
+ *  Return               : T_UBYTE
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE nvic_GetActiveInterrupt(IRQn_Type lub_IRQn){
+  return (rps_NVIC->rul_IABR[lub_IRQn / 32]) & (1 << (lub_IRQn % 32));
+}
+
+/**************************************************************
+ *  Name                 : nvic_SetInterruptPriority
+ *  Description          : Sets interrupt priority
+ *  Parameters           : [IRQn_Type lub_IRQn, T_UBYTE lub_Priority]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void nvic_SetInterruptPriority(IRQn_Type lub_IRQn, T_UBYTE lub_Priority){
+  rps_NVIC->rul_IP[lub_IRQn / 4] |= lub_Priority << (8 * (lub_IRQn % 4) + 4 );
+}
+
+/**************************************************************
+ *  Name                 : nvic_SetInterruptPriority
+ *  Description          : Sets interrupt priority
+ *  Parameters           : [IRQn_Type lub_IRQn, T_UBYTE lub_Priority]
+ *  Return               : T_UBYTE
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE nvic_GetInterruptPriority(IRQn_Type lub_IRQn){
+  return (rps_NVIC->rul_IP[lub_IRQn / 4]) & (0x0F << (8 * (lub_IRQn % 4) + 4 ));
+}
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

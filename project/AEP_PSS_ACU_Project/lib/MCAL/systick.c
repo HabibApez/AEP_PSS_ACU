@@ -4,16 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
- * $Revision: version 1$
+ * $Source: systick.c $
+ * $Revision: version 1 $
  * $Author: Habib Apez $
- * $Date: 2017-11- 22 $
+ * $Date: 2017-11-15 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
-    Main at APP in Scheduler.
-    Window Lifter project main with Scheduler and State Machines.
+/** \systick.c
+    systick module file for SK32144 uC. Located at SERVICES.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -37,107 +36,79 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: systick.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "Common\Std_Types.h"                  // OK
-#include "HAL\clock.c"                         // OK
-#include "HAL\delays.c"                        // OK
-#include "HAL\button.c"                        // OK
-#include "HAL\segmentbar.c"                    // OK
-#include "HAL\leds.c"                          // OK
-#include "HAL\sensors.c"
-#include "SERVICES\Interrupts\interrupts.c"    // OK
-#include "SERVICES\Scheduler\SchM.c"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.c"       // OK
-
+# include "systick.h"
 
 /* Constants and types  */
 /*============================================================================*/
 
 /* Variables */
 /*============================================================================*/
+/** Pointers to S_SYSTICK */
+S_SYSTICK *rps_SYSTICK = SYSTICK_Address;
 
 /* Private functions prototypes */
 /*============================================================================*/
-void SysTick_Handler(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
-/**************************************************************
- *  Name                 : SystTick interruption
- *  Description          : Moves the Window upwards
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SysTick_Handler(void){
-  if ( NULL!= GlbSysTickCallback)
-	  GlbSysTickCallback();
-  // leds_ToggleBlueBoardLED();
-}
-
-/**************************************************************
- *  Name                 : main
- *  Description          : Implements the main function
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
- int main(void){
-  clock_InitClock();
-  delays_InitTimer();
-  segmentbar_InitBar();
-  button_InitButtons();
-  leds_InitBoardLeds();
-  leds_InitLeds();
-  sensor_InitSensors();
-
-  T_ULONG SensorReading = 0;
-
-  for(;;){
-    SensorReading = sensor_ReadDriverSeatBeltSensor();
-    if(SensorReading >3750){			/* If result > 3.75V */
-      leds_TurnOnUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading > 2500) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOnDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading >1250) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOnAntipinchLED();
-    }
-    else {
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-
-  }
-
-  for(;;) leds_ToggleBlueBoardLED();
-
-  SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
-  SchM_Start();		        /* Start Scheduler Services */
-
-  for(;;){
-    // Do nothing
-  }
-
-  return 0;
-}
 
 /* Exported functions */
 /*============================================================================*/
+/**************************************************************
+ *  Name                 : InitSysTick
+ *  Description          : Initializes System Tick Counter
+ *  Parameters           : [T_ULONG lul_Value]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void systick_InitSysTick(T_ULONG lul_Value){
+  systick_ReloadSysTickValue(lul_Value);
+  rps_SYSTICK->rul_CVR = 0;
+  rps_SYSTICK->rul_CSR = 6;                         /* Core Clock and interrupt enabled */
+}
+
+/**************************************************************
+ *  Name                 : systick_EnableSysTick
+ *  Description          : Enables counter
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void systick_EnableSysTick(void){
+  rps_SYSTICK->rul_CSR |= 1;
+}
+
+/**************************************************************
+ *  Name                 : systick_DisableSysTick
+ *  Description          : Disables counter
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void systick_DisableSysTick(void){
+  rps_SYSTICK->rul_CSR &= ~1;
+}
+
+/**************************************************************
+ *  Name                 : ReloadSysTickValue
+ *  Description          : Initializes System Tick Counter
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void systick_ReloadSysTickValue(T_ULONG lul_Value){ 
+  rps_SYSTICK->rul_RVR = lul_Value;               /* TOSC = 1/FOSC = 1/80Mhz = 12.5us*/          
+                                                  /* TickTime = Value * TOSC = Value * 12.5us */   
+                                                  /* Value = TickTime / 12.5us = 781.25us / 12.5us = 62.5 */          
+                                                  /* 24-bit register max_value = (2^21)-1 = 16777215 */
+}
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

@@ -1,0 +1,4 @@
+This is the folder for the Application Layer
+
+Version 1: OK
+Version 2 (Naming Conventions and MISRA): OK  

@@ -4,14 +4,14 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
+ * $Source: Main.c $
  * $Revision: version 1$
  * $Author: Habib Apez $
  * $Date: 2017-11- 22 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
+/** \Mainc
     Main at APP in Scheduler.
     Window Lifter project main with Scheduler and State Machines.
 */
@@ -37,22 +37,20 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: Main.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "Common\Std_Types.h"                  // OK
-#include "HAL\clock.c"                         // OK
-#include "HAL\delays.c"                        // OK
-#include "HAL\button.c"                        // OK
-#include "HAL\segmentbar.c"                    // OK
-#include "HAL\leds.c"                          // OK
-#include "HAL\sensors.c"
-#include "SERVICES\Interrupts\interrupts.c"    // OK
-#include "SERVICES\Scheduler\SchM.c"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.c"       // OK
-
+#include "C:\My Documents\Continental\IAR\Devs\lib\Common\Std_Types.h"                  // OK
+#include "C:\My Documents\Continental\IAR\Devs\lib\HAL\clock.c"                         // OK
+#include "C:\My Documents\Continental\IAR\Devs\lib\HAL\delays.c"                        // OK
+#include "C:\My Documents\Continental\IAR\Devs\lib\HAL\button.c"                        // OK
+#include "C:\My Documents\Continental\IAR\Devs\lib\HAL\segmentbar.c"                    // OK
+#include "C:\My Documents\Continental\IAR\Devs\lib\HAL\leds.c"                          // OK
+#include "C:\My Documents\Continental\IAR\Devs\lib\SERVICES\Interrupts\interrupts.c"    // OK
+#include "C:\My Documents\Continental\IAR\Devs\lib\SERVICES\Scheduler\SchM.c"           // OK
+#include "C:\My Documents\Continental\IAR\Devs\lib\SERVICES\Scheduler\SchM_Cfg.c"       // OK
 
 /* Constants and types  */
 /*============================================================================*/
@@ -89,52 +87,20 @@ void SysTick_Handler(void){
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
- int main(void){
+ void main(void){
   clock_InitClock();
   delays_InitTimer();
   segmentbar_InitBar();
   button_InitButtons();
   leds_InitBoardLeds();
   leds_InitLeds();
-  sensor_InitSensors();
-
-  T_ULONG SensorReading = 0;
-
-  for(;;){
-    SensorReading = sensor_ReadDriverSeatBeltSensor();
-    if(SensorReading >3750){			/* If result > 3.75V */
-      leds_TurnOnUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading > 2500) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOnDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading >1250) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOnAntipinchLED();
-    }
-    else {
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-
-  }
-
-  for(;;) leds_ToggleBlueBoardLED();
-
+    
   SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
   SchM_Start();		        /* Start Scheduler Services */
-
+    
   for(;;){
     // Do nothing
   }
-
-  return 0;
 }
 
 /* Exported functions */

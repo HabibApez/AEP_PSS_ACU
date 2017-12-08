@@ -4,16 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
+ * $Source: SchM_Cfg.c $
  * $Revision: version 1$
  * $Author: Habib Apez $
  * $Date: 2017-11- 22 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
-    Main at APP in Scheduler.
-    Window Lifter project main with Scheduler and State Machines.
+/** \SchM_Cfg.c
+    Source of SchM_Cfg Located at SERVICES in Scheduler.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -37,105 +36,44 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: SchM_Cfg.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "Common\Std_Types.h"                  // OK
-#include "HAL\clock.c"                         // OK
-#include "HAL\delays.c"                        // OK
-#include "HAL\button.c"                        // OK
-#include "HAL\segmentbar.c"                    // OK
-#include "HAL\leds.c"                          // OK
-#include "HAL\sensors.c"
-#include "SERVICES\Interrupts\interrupts.c"    // OK
-#include "SERVICES\Scheduler\SchM.c"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.c"       // OK
-
+#include "SchM_Cfg.h"
+//#include "SchM_Tasks.h"
+#include "SchM_Tasks.c"
 
 /* Constants and types  */
 /*============================================================================*/
+const SchM_TaskConfigType SchM_TaskDescriptor[] = {
+  /*    Offset,                 Mask,                   Task_ID,                Function Pointer*/
+  {   SCHM_OFFSET_ZERO,      SCHM_MASK_1MS,             SCHM_TASKID_1MS,        &SchM_1ms_Task          },
+  {   SCHM_OFFSET_ONE,       SCHM_MASK_2MS,             SCHM_TASKID_2MS,        &SchM_2ms_Task          },
+  {   SCHM_OFFSET_TWO,       SCHM_MASK_4MS,             SCHM_TASKID_4MS,        &SchM_4ms_Task          },
+  {   SCHM_OFFSET_THREE,     SCHM_MASK_8MS,             SCHM_TASKID_8MS,        &SchM_8ms_Task          },
+  {   SCHM_OFFSET_FIVE,      SCHM_MASK_16MS,            SCHM_TASKID_16MS,       &SchM_16ms_Task         },
+  {   SCHM_OFFSET_SIX,       SCHM_MASK_32MS,            SCHM_TASKID_32MS,       &SchM_32ms_Task         }
+};
+
+const SchM_ConfigType SchM_Config = {
+  (sizeof(SchM_TaskDescriptor)/sizeof(SchM_TaskConfigType)),    /* Number of Tasks */
+  &SchM_TaskDescriptor[0]                                       /* Tasks Descriptions */ 
+                                                                /* SchMTaskDescriptor */ 
+};
 
 /* Variables */
 /*============================================================================*/
 
 /* Private functions prototypes */
 /*============================================================================*/
-void SysTick_Handler(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
-/**************************************************************
- *  Name                 : SystTick interruption
- *  Description          : Moves the Window upwards
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SysTick_Handler(void){
-  if ( NULL!= GlbSysTickCallback)
-	  GlbSysTickCallback();
-  // leds_ToggleBlueBoardLED();
-}
-
-/**************************************************************
- *  Name                 : main
- *  Description          : Implements the main function
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
- int main(void){
-  clock_InitClock();
-  delays_InitTimer();
-  segmentbar_InitBar();
-  button_InitButtons();
-  leds_InitBoardLeds();
-  leds_InitLeds();
-  sensor_InitSensors();
-
-  T_ULONG SensorReading = 0;
-
-  for(;;){
-    SensorReading = sensor_ReadDriverSeatBeltSensor();
-    if(SensorReading >3750){			/* If result > 3.75V */
-      leds_TurnOnUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading > 2500) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOnDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-    else if (SensorReading >1250) { 	/* If result > 3.75V */
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOnAntipinchLED();
-    }
-    else {
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-    }
-
-  }
-
-  for(;;) leds_ToggleBlueBoardLED();
-
-  SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
-  SchM_Start();		        /* Start Scheduler Services */
-
-  for(;;){
-    // Do nothing
-  }
-
-  return 0;
-}
 
 /* Exported functions */
 /*============================================================================*/
