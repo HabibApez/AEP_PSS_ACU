@@ -42,8 +42,8 @@
 /* Includes */
 /*============================================================================*/
 #include "SERVICES\Scheduler\SchM_Tasks.h"
-//#include "APP\sensorsm.h"					   // OK
-//#include "HAL\leds.h"
+#include "APP\sensorsm.h"					   // OK
+#include "HAL\leds.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -70,7 +70,7 @@
  *  Critical/explanation : No
  **************************************************************/
 void SchM_5ms_Task(void){   /* Code Task0*/
-  //leds_ToggleBlueBoardLED();
+  leds_ToggleBlueBoardLED();
 }
 
 /**************************************************************
@@ -81,7 +81,7 @@ void SchM_5ms_Task(void){   /* Code Task0*/
  *  Critical/explanation : No
  **************************************************************/
 void SchM_10ms_Task(void){  /* Code Task1*/
-  leds_ToggleRedBoardLED();
+  //leds_ToggleRedBoardLED();
   sensorsm_StateMachine();
 }
 
