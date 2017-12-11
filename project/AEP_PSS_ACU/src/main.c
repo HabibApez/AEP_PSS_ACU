@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: main.c $
- * $Revision: version 1$
+ * $Revision: version 2$
  * $Author: Habib Apez $
- * $Date: 2017-11- 22 $
+ * $Date: 2017-12 -10 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -33,6 +33,8 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          2         |   Sensor Manager added to the   */
+/* Habib Apez          |          2         |   scheduler                     */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -42,13 +44,9 @@
 
 /* Includes */
 /*============================================================================*/
-#include "Common\Std_Types.h"                  // OK
 #include "HAL\clock.h"                         // OK
-#include "HAL\delays.h"                        // OK
-#include "HAL\button.h"                        // OK
-#include "HAL\segmentbar.h"                    // OK
-#include "HAL\sensors.h"                    // OK
-#include "HAL\leds.h"                          // OK
+#include "HAL\leds.h"                         // OK
+#include "HAL\sensors.h"                         // OK
 #include "SERVICES\Interrupts\interrupts.h"    // OK
 #include "SERVICES\Scheduler\SchM.h"           // OK
 #include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
@@ -91,9 +89,6 @@ void SysTick_Handler(void){
  **************************************************************/
  int main(void){
   clock_InitClock();
-  delays_InitTimer();
-  segmentbar_InitBar();
-  button_InitButtons();
   leds_InitBoardLeds();
   leds_InitLeds();
   sensor_InitSensors();
