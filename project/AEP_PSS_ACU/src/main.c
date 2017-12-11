@@ -43,15 +43,15 @@
 /* Includes */
 /*============================================================================*/
 #include "Common\Std_Types.h"                  // OK
-#include "HAL\clock.c"                         // OK
-#include "HAL\delays.c"                        // OK
-#include "HAL\button.c"                        // OK
-#include "HAL\segmentbar.c"                    // OK
-#include "HAL\leds.c"                          // OK
-#include "APP\sensorsm.c"					   // OK
-#include "SERVICES\Interrupts\interrupts.c"    // OK
-#include "SERVICES\Scheduler\SchM.c"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.c"       // OK
+#include "HAL\clock.h"                         // OK
+#include "HAL\delays.h"                        // OK
+#include "HAL\button.h"                        // OK
+#include "HAL\segmentbar.h"                    // OK
+#include "HAL\sensors.h"                    // OK
+#include "HAL\leds.h"                          // OK
+#include "SERVICES\Interrupts\interrupts.h"    // OK
+#include "SERVICES\Scheduler\SchM.h"           // OK
+#include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
 
 
 /* Constants and types  */
@@ -77,7 +77,7 @@ void SysTick_Handler(void);
  *  Critical/explanation : No
  **************************************************************/
 void SysTick_Handler(void){
-  if ( NULL!= GlbSysTickCallback)
+  if (NULL!= GlbSysTickCallback)
 	  GlbSysTickCallback();
   // leds_ToggleBlueBoardLED();
 }
@@ -115,5 +115,5 @@ void SysTick_Handler(void){
 /* Exported functions */
 /*============================================================================*/
 
-/* Notice: the file ends with a blank new line to avoid compiler warnings */
+ /* Notice: the file ends with a blank new line to avoid compiler warnings */
 
