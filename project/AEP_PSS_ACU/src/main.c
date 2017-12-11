@@ -45,8 +45,8 @@
 /* Includes */
 /*============================================================================*/
 #include "HAL\clock.h"                         // OK
-#include "HAL\leds.h"                         // OK
-#include "HAL\sensors.h"                         // OK
+#include "HAL\leds.h"                          // OK
+#include "HAL\sensors.h"                       // OK
 #include "SERVICES\Interrupts\interrupts.h"    // OK
 #include "SERVICES\Scheduler\SchM.h"           // OK
 #include "SERVICES\Scheduler\SchM_Cfg.h"       // OK

@@ -70,7 +70,8 @@
  *  Critical/explanation : No
  **************************************************************/
 void SchM_5ms_Task(void){   /* Code Task0*/
-  leds_ToggleBlueBoardLED();
+  //leds_ToggleBlueBoardLED();
+  // Read CAN bus and collect data from ECU each 10ms*
 }
 
 /**************************************************************
@@ -94,6 +95,7 @@ void SchM_10ms_Task(void){  /* Code Task1*/
  **************************************************************/
 void SchM_20ms_Task(void){  /* Code Task2*/
   //leds_ToggleGreenBoardLED();
+  // Send Chrime and Seat Belt data each 200ms
 }
 
 /**************************************************************
@@ -105,6 +107,7 @@ void SchM_20ms_Task(void){  /* Code Task2*/
  **************************************************************/
 void SchM_40ms_Task(void){  /* Code Task3*/
   //leds_ToggleAntipinchLED();
+  // Run Driver an Passenger Reminders state machines
 }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */
