@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: sensors.c $
- * $Revision: version 2 $
+ * $Source: can.c $
+ * $Revision: version 1 $
  * $Author: Habib Apez $
- * $Date: 2017-12-12 $
+ * $Date: 2017-12-11 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \sensors.c
-    sensors module file for SK32144 uC. Located at MCAL.
+/** \can.c
+    can module file for SK32144 uC. Located at MCAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -33,17 +33,16 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
-/* Habib Apez          |          2         |   General Read Sensor function  */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: sensors.c  $
+ * $Log: can.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "HAL\sensors.h"
+#include "HAL\can.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -63,59 +62,79 @@
 /* Exported functions */
 /*============================================================================*/
 /**************************************************************
- *  Name                 : sensor_InitSensors
- *  Description          : Configures the ADC and 3 inputs for the sensors
+ *  Name                 : can_InitCAN0
+ *  Description          : Initializes the CAN0
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void sensor_InitSensors(void){
-  adc_InitADC(rps_ADC0, PCC_ADC0_INDEX);
+void can_InitCAN0(){
+  flexcan_InitFlexCAN0();
+  flexcan_DisableFlexCANModule(rps_CAN0);
+  flexcan_ConfigClock(rps_CAN0, 0x2000);
+  flexcan_EnableFlexCANModule(rps_CAN0);
+
+  flexcan_ConfigControlReg(rps_CAN0, 0x00DB0006);	  /* Configure for 500 KHz bit time */
+													  /* Time quanta freq = 16 time quanta x 500 KHz bit time= 8MHz */
+													  /* PRESDIV+1 = Fclksrc/Ftq = 8 MHz/8 MHz = 1 */
+													  /*    so PRESDIV = 0 */
+													  /* PSEG2 = Phase_Seg2 - 1 = 4 - 1 = 3 */
+													  /* PSEG1 = PSEG2 = 3 */
+													  /* PROPSEG= Prop_Seg - 1 = 7 - 1 = 6 */
+													  /* RJW: since Phase_Seg2 >=4, RJW+1=4 so RJW=3. */
+													  /* SMP = 1: use 3 bits per CAN sample */
+													  /* CLKSRC=0 (unchanged): Fcanclk= Fosc= 8 MHz */
+  flexcan_ClearMessageBuffer(rps_CAN0);
+  flexcan_ConfigGlobalAccepMask(rps_CAN0, 0x1FFFFFFF);	/* Global acceptance mask: check all ID bits */
+
+  flexcan_ConfigMessageBuffer(rps_CAN0, RX_MESSAGE1_MESSAGEBUFFER, (RX_MESSAGE1_ID<<2)<<16, 0x04000000);   	/* Msg Buf 4, word 0: Enable for reception */
+																			/* EDL,BRS,ESI=0: CANFD not used */
+																			/* CODE=4: MB set to RX inactive */
+																			/* IDE=0: Standard ID */
+																			/* SRR, RTR, TIME STAMP = 0: not applicable */
+																			/* Msg Buf 4, word 1: Standard ID = 0x511 */
+  flexcan_ConfigMessageBuffer(rps_CAN0, RX_MESSAGE2_MESSAGEBUFFER, (RX_MESSAGE2_ID<<2)<<16, 0x04000000);   	/* Msg Buf 1, word 0: Enable for reception */
+																			/* EDL,BRS,ESI=0: CANFD not used */
+																			/* CODE=4: MB set to RX inactive */
+																			/* IDE=0: Standard ID */
+																			/* SRR, RTR, TIME STAMP = 0: not applicable */
+																			/* Msg Buf 1, word 1: Standard ID = 0x320 */
+  flexcan_ValidateConfiguration(rps_CAN0);
 }
 
 /**************************************************************
- *  Name                 : sensor_ReadSensor
- *  Description          : Read the voltage of indicated Sensor in mv
- *  Parameters           : [T_UBYTE lub_Sensor]
- *  Return               : T_UWORD
- *  Critical/explanation : No
- **************************************************************/
-T_UWORD sensor_ReadSensor(T_UBYTE lub_Sensor){
-  return adc_ReadADCChannel(rps_ADC0, lub_Sensor);
-}
-
-/**************************************************************
- *  Name                 : sensor_ReadDriverSeatBeltSensor
- *  Description          : Read the voltage of the Driver Seat Belt Sensor in mv
+ *  Name                 : can_TransmitMessage
+ *  Description          : Transmits a CAN message
  *  Parameters           : [void]
- *  Return               : T_UWORD
- *  Critical/explanation : No
+ *  Return               : void
+ *  Critical/explanation : Assumption:  Message buffer CODE is INACTIVE
  **************************************************************/
-T_UWORD sensor_ReadDriverSeatBeltSensor(void){
-  return adc_ReadADCChannel(rps_ADC0, DRIVER_SEAT_BELT_SENSOR);
+void can_TransmitMessageCAN0(T_UBYTE lub_MessageBuffer, T_ULONG lul_MessageId, T_ULONG *lpl_TxData){
+  flexcan_ClearMessageBufferFlag(rps_CAN0, lub_MessageBuffer);
+  flexcan_TransmitMessageFlexCAN(rps_CAN0, lub_MessageBuffer, lul_MessageId, lpl_TxData);
 }
 
 /**************************************************************
- *  Name                 : sensor_ReadPassengerSeatBeltSensor
- *  Description          : Read the voltage of the Passenger Seat Belt Sensor in mv
+ *  Name                 : can_ReceiveMessage
+ *  Description          : Receives a CAN message
  *  Parameters           : [void]
- *  Return               : T_UWORD
+ *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-T_UWORD sensor_ReadPassengerSeatBeltSensor(void){
-  return adc_ReadADCChannel(rps_ADC0, PASSENGER_SEAT_BELT_SENSOR);
+void can_ReceiveMessageCAN0(T_UBYTE lub_MessageBuffer, T_ULONG *lpl_RxData){
+  flexcan_ReceiveMessageFlexCAN(rps_CAN0, lub_MessageBuffer, lpl_RxData);
+  flexcan_ClearMessageBufferFlag(rps_CAN0, lub_MessageBuffer);
 }
 
 /**************************************************************
- *  Name                 : sensor_ReadPassengerSeatSensor
- *  Description          : Read the voltage of the Passenger Seat Sensor in mv
- *  Parameters           : [void]
- *  Return               : T_UWORD
+ *  Name                 : can_CheckMessageArrivalCAN0
+ *  Description          : Checks if a CAN Messages has arrived
+ *  Parameters           : [T_UBYTE lub_MessageBuffer]
+ *  Return               : T_UBYTE
  *  Critical/explanation : No
  **************************************************************/
-T_UWORD sensor_ReadPassengerSeatSensor(void){
-  return adc_ReadADCChannel(rps_ADC0, PASSENGER_SEAT_SENSOR);
+T_UBYTE can_CheckMessageArrivalCAN0(T_UBYTE lub_MessageBuffer){
+  return flexcan_CheckMessageBufferRxFlag(rps_CAN0, lub_MessageBuffer);
 }
-
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

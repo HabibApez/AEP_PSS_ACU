@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: sensors.h $
+ * $Source: can.h $
  * $Revision: version 1 $
  * $Author: Habib Apez $
- * $Date: 2017-12-07  $
+ * $Date: 2017-12-11  $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \sensors.h
-    Header file for sensors module. Located at HAL.
+/** \can.h
+    Header file for can module. Located at HAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -37,33 +37,34 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: sensors.h  $
+ * $Log: can.h  $
   ============================================================================*/
-#ifndef __SENSORS_H
-#define __SENSORS_H
+#ifndef __CAN_H
+#define __CAN_H
 
 /* Includes */
 /*============================================================================*/
-#include "MCAL\io.h"
-#include "MCAL\pcc.h"
-#include "MCAL\port.h"
-#include "MCAL\adc.h"
+#include "MCAL\flexcan.h"
 
 /* Constants and types */
 /*============================================================================*/
-#define DRIVER_SEAT_BELT_SENSOR		1	/* ADC Channel 1, PTA[1], Driver Seat Belt Sensor */
-#define PASSENGER_SEAT_BELT_SENSOR	0	/* ADC Channel 0, PTA[0], Passenger Seat Belt Sensor */
-#define PASSENGER_SEAT_SENSOR		3	/* ADC Channel 3, PTA[7], Passenger Seat Sensor */
+#define RX_MESSAGE1_ID		511		/*Id of the Message1 */
+#define RX_MESSAGE2_ID		320		/*Id of the Message1 */
+
+#define TX_MESSAGE1_ID		510		/*Id of the Message1 */
+#define TX_MESSAGE2_ID		550		/*Id of the Message1 */
+
+#define RX_MESSAGE1_MESSAGEBUFFER 	4 		/*Message Buffer of the Message1 */
+#define RX_MESSAGE2_MESSAGEBUFFER 	0 		/*Message Buffer of the Message1 */
 
 /* Exported Variables */
 /*============================================================================*/
 
 /* Exported functions prototypes */
 /*============================================================================*/
-void sensor_InitSensors(void);
-T_UWORD sensor_ReadDriverSeatBeltSensor(void);
-T_UWORD sensor_ReadPassengerSeatBeltSensor(void);
-T_UWORD sensor_ReadPassengerSeatSensor(void);
-T_UWORD sensor_ReadSensor(T_UBYTE lub_Sensor);
+void can_InitCAN0(void);
+void can_TransmitMessageCAN0(T_UBYTE lub_MessageBuffer, T_ULONG lul_MessageId, T_ULONG *lpl_TxData);
+void can_ReceiveMessageCAN0(T_UBYTE lub_MessageBuffer, T_ULONG *lpl_RxData);
+T_UBYTE can_CheckMessageArrivalCAN0(T_UBYTE lub_MessageBuffer);
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */
