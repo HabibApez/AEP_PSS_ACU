@@ -45,17 +45,25 @@
 /* Includes */
 /*============================================================================*/
 #include "MCAL\flexcan.h"
+#include "MCAL\io.h"
+#include "MCAL\pcc.h"
+#include "MCAL\port.h"
 
 /* Constants and types */
 /*============================================================================*/
-#define RX_MESSAGE1_ID		511		/*Id of the Message1 */
-#define RX_MESSAGE2_ID		320		/*Id of the Message1 */
+#define PTE4 	4 	/* CAN_RX */
+#define PTE5 	5 	/* CAN_TX */
 
-#define TX_MESSAGE1_ID		510		/*Id of the Message1 */
-#define TX_MESSAGE2_ID		550		/*Id of the Message1 */
+#define RX_MSG1_ID		0x511		/*Id of the Message1 */
+#define RX_MSG2_ID		0x320		/*Id of the Message1 */
+#define RX_MSG1_BUFF 	4 		/*Message Buffer of the Message1 */
+#define RX_MSG2_BUFF 	0 		/*Message Buffer of the Message1 */
 
-#define RX_MESSAGE1_MESSAGEBUFFER 	4 		/*Message Buffer of the Message1 */
-#define RX_MESSAGE2_MESSAGEBUFFER 	0 		/*Message Buffer of the Message1 */
+#define TX_MSG1_ID		0x510		/*Id of the Message1 */
+#define TX_MSG2_ID		0x550		/*Id of the Message1 */
+#define TX_MSG1_BUFF 	1 		/*Message Buffer of the Message1 */
+#define TX_MSG2_BUFF 	2 		/*Message Buffer of the Message1 */
+
 
 /* Exported Variables */
 /*============================================================================*/

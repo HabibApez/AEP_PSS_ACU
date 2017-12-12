@@ -44,6 +44,7 @@
 /* Includes */
 /*============================================================================*/
 #include "Common\Std_Types.h"
+#include "MCAL\pcc.h"
 
 /* Constants and types */
 /*============================================================================*/
@@ -133,5 +134,6 @@ void flexcan_ClearMessageBufferFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer);
 void flexcan_TransmitMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_ULONG lul_MessageId, T_ULONG *lpul_TxData);
 void flexcan_ReceiveMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_ULONG *lpul_RxData);
 T_UBYTE flexcan_CheckMessageBufferRxFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer);
+void flexcan_ConfigPinsCAN0();
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

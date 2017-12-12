@@ -300,30 +300,30 @@ void sensorsm_UpdateSStatus(S_OcuppancySeatSensor *lps_SSensor){
 void sensorsm_StateMachine(void){
   switch(re_SensorSmState){
     case SENSOR_IDLE:
-      leds_TurnOffUpLED();
-      leds_TurnOffDownLED();
-      leds_TurnOffAntipinchLED();
-      sensorsm_IdleState();
+      //leds_TurnOffUpLED();
+      //leds_TurnOffDownLED();
+      //leds_TurnOffAntipinchLED();
+      //sensorsm_IdleState();
       break;
 
     case DRIVER_SEAT_BELT_VALIDATION:
-    	leds_TurnOnUpLED();
-    	leds_TurnOffDownLED();
-    	leds_TurnOffAntipinchLED();
+    	//leds_TurnOnUpLED();
+    	//leds_TurnOffDownLED();
+    	//leds_TurnOffAntipinchLED();
     	sensorsm_DriverSBValidationState();
       break;
 
     case PASSENGER_SEAT_BELT_VALIDATION:
-    	leds_TurnOffUpLED();
-    	leds_TurnOnDownLED();
-    	leds_TurnOffAntipinchLED();
+    	//leds_TurnOffUpLED();
+    	//leds_TurnOnDownLED();
+    	//leds_TurnOffAntipinchLED();
     	sensorsm_PassengerSBValidationState();
       break;
 
     case PASSENGER_SEAT_VALIDATION:
-    	leds_TurnOffUpLED();
-    	leds_TurnOffDownLED();
-    	leds_TurnOnAntipinchLED();
+    	//leds_TurnOffUpLED();
+    	//leds_TurnOffDownLED();
+    	//leds_TurnOnAntipinchLED();
     	sensorsm_PassengerSValidationState();
       break;
 

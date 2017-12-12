@@ -44,6 +44,8 @@
 #include "SERVICES\Scheduler\SchM_Tasks.h"
 #include "APP\sensorsm.h"					   // OK
 #include "HAL\leds.h"
+#include "HAL\can.h"
+
 
 /* Constants and types  */
 /*============================================================================*/
@@ -72,6 +74,20 @@
 void SchM_5ms_Task(void){   /* Code Task0*/
   //leds_ToggleBlueBoardLED();
   // Read CAN bus and collect data from ECU each 10ms*
+
+	leds_TurnOnAntipinchLED();
+	if(1 == can_CheckMessageArrivalCAN0(RX_MSG1_BUFF)){
+		  leds_TurnOnDownLED();
+		  T_ULONG rul_RxMessageData[2] = {0, 0};
+		  T_ULONG rul_TxMessageData[2] = {0, 0};
+	      can_ReceiveMessageCAN0(RX_MSG1_BUFF, rul_RxMessageData);
+	      rul_TxMessageData[0] = rul_RxMessageData[0];
+	      rul_TxMessageData[1] = rul_RxMessageData[1];
+		  //can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
+	      leds_TurnOffDownLED();
+
+	}
+	leds_TurnOffAntipinchLED();
 }
 
 /**************************************************************

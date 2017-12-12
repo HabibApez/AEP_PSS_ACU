@@ -42,7 +42,6 @@
 /* Includes */
 /*============================================================================*/
 #include "MCAL\flexcan.h"
-#include "MCAL\pcc.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -201,7 +200,7 @@ void flexcan_TransmitMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T
 
   lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + 1] = lul_MessageId;
 
-  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + 0] = 0x0C400000 | 8 <<16; /* MB0 word 0: */
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + 0] = 0x0C400000 | (8 <<16); /* MB0 word 0: */
 		                                                /* EDL,BRS,ESI=0: CANFD not used */
 		                                                /* CODE=0xC: Activate msg buf to transmit */
 		                                                /* IDE=0: Standard ID */
