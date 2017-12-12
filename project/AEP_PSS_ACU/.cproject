@@ -258,7 +258,6 @@
 						</toolChain>
 					</folderInfo>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.release.2105900073.Project_Settings/Debugger/AEP_PSS_ACU_Debug_RAM.launch" name="AEP_PSS_ACU_Debug_RAM.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/AEP_PSS_ACU_Debug_RAM.launch" toolsToInvoke=""/>
-					<fileInfo id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.release.2105900073.Project_Settings/Debugger/AEP_PSS_ACU_Debug.launch" name="AEP_PSS_ACU_Debug.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/AEP_PSS_ACU_Debug.launch" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
@@ -393,7 +392,6 @@
 						</toolChain>
 					</folderInfo>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.Debug_RAM.Project_Settings/Debugger/AEP_PSS_ACU_Release.launch" name="AEP_PSS_ACU_Release.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/AEP_PSS_ACU_Release.launch" toolsToInvoke=""/>
-					<fileInfo id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.Debug_RAM.Project_Settings/Debugger/AEP_PSS_ACU_Debug.launch" name="AEP_PSS_ACU_Debug.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/AEP_PSS_ACU_Debug.launch" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>

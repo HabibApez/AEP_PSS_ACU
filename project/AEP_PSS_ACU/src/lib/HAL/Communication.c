@@ -4,16 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
- * $Revision: version 2$
- * $Author: Habib Apez $
- * $Date: 2017-12 -10 $
+ * $Source: Communication.c $
+ * $Revision: version 1 $
+ * $Author: Antonio Vazquez $
+ * $Date: 2017-12-08 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
-    Main at APP in Scheduler.
-    Window Lifter project main with Scheduler and State Machines.
+/** \Communication.c
+    CAN BUS Communication. Located at HAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -32,26 +31,17 @@
 /*============================================================================*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Habib Apez          |          1         |   Initial version               */
-/* Habib Apez          |          2         |   Sensor Manager added to the   */
-/* Habib Apez          |          2         |   scheduler                     */
+/* Antonio Vazquez    |          1         |   Initial version               */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: Communication.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "HAL\clock.h"                         // OK
-#include "HAL\leds.h"                          // OK
-#include "HAL\sensors.h"                       // OK
-#include "SERVICES\Interrupts\interrupts.h"    // OK
-#include "SERVICES\Scheduler\SchM.h"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
-#include "SERVICES\CAN\CAN_Services.h"
-#include "MCAL\io.h"
+#include "HAL\Communication.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -61,62 +51,74 @@
 
 /* Private functions prototypes */
 /*============================================================================*/
-void SysTick_Handler(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
+
+/* Exported functions */
+/*============================================================================*/
 /**************************************************************
- *  Name                 : SystTick interruption
- *  Description          : Moves the Window upwards
+ *  Name                 : FLEXCAN0_init
+ *  Description          : Initialize the CAN0 BUS
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void SysTick_Handler(void){
-  if (NULL!= GlbSysTickCallback)
-	  GlbSysTickCallback();
-   leds_ToggleBlueBoardLED();
+void FLEXCAN_init(S_CAN_Type *CAN){
+ConfigureCAN(CAN, PCC_FlexCAN0_INDEX);
+CHECK_MB_ID (CAN, CHECK_ALL_ID);
+ACCEPTANCE_MB_ID (CAN, GLOBAL_ACCEPTANCE_MASK);
+Configure_Receiver(CAN, MSG_BUF_4, STANDARD_ID, ID_0x511);
+Configure_Receiver(CAN, MSG_BUF_1, STANDARD_ID, ID_0x320);
+EnableCan(CAN); /*To change the number of MB reserved, a modification to this function is required.
+                      *located at MCAL/FlexCan.c */
 }
 
 /**************************************************************
- *  Name                 : main
- *  Description          : Implements the main function
- *  Parameters           : [void]
- *  Return               : voidx
+ *  Name                 : FLEXCAN0_transmit_msg
+ *  Description          : Transmit a message through CAN BUS
+ *  Parameters           : [S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA]
+ *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
- int main(void){
+void FLEXCAN_transmit_msg (S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA){
+        CAN->rul_IFLAG1 = FLAG_READY_MASK << can_mb;
 
-  clock_InitClock();
-  leds_InitBoardLeds();
-  leds_InitLeds();
-  sensor_InitSensors();
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA1] = TxDATA[FIRST_PART_OF_MSG];
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA2] = TxDATA[SECOND_PART_OF_MSG];
 
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_ID] = CAN_Id;
 
-FLEXCAN_init(rps_CAN0);
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_CFG] = ENABLE_TRANSMITION | TRANSMISION_FRAME | ID_Type | DLC << CAN_WMBn_CS_DLC_SHIFT;
 
- for(;;){
-	 ACU_StateMachine();
-	     }
-
-
-
-
- SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
- SchM_Start();		        /* Start Scheduler Services */
-
-  for(;;){
-    // Do nothing
-  }
-
-  return 0;
 }
 
-/* Exported functions */
-/*============================================================================*/
+
+ /**************************************************************
+  *  Name                 : FLEXCAN0_receive_msg
+  *  Description          : Receives a message through CAN BUS
+  *  Parameters           : [S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA]
+  *  Return               : void
+  *  Critical/explanation : No
+  **************************************************************/
+  void FLEXCAN_receive_msg(S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG *RxDATA){
+ RxDATA[FIRST_PART_OF_MSG] = CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA1];
+ RxDATA[SECOND_PART_OF_MSG] = CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA2];
+ CAN->rul_IFLAG1 = FLAG_READY_MASK << can_mb;
+  }
+
+  /**************************************************************
+   *  Name                 : FLEXCAN0_msg_flag
+   *  Description          : Read msg flag to determinate waiting messages
+   *  Parameters           : [S_CAN_Type *CAN, const T_UBYTE can_mb]
+   *  Return               : void
+   *  Critical/explanation : No
+   **************************************************************/
+   T_UBYTE FLEXCAN_msg_flag(S_CAN_Type *CAN, const T_UBYTE can_mb){
+	   return ((CAN->rul_IFLAG1>> can_mb) & ACTIVE);
+   }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */
-
