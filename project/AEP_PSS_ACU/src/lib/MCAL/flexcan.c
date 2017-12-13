@@ -32,6 +32,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Antonio Vazquez     |          2        |   Macros' revision              */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -45,7 +46,7 @@
 
 /* Constants and types  */
 /*============================================================================*/
-#define MSG_BUF_SIZE  4    /* Msg Buffer Size. (CAN 2.0AB: 2 hdr +  2 data= 4 words) */
+    /* Msg Buffer Size. (CAN 2.0AB: 2 hdr +  2 data= 4 words) */
 
 /* Variables */
 /*============================================================================*/
@@ -67,7 +68,7 @@
  *  Critical/explanation : No
  **************************************************************/
 void flexcan_DisableFlexCANModule(S_CAN *lps_CAN){
-  lps_CAN->rul_MCR |= 0x80000000;				/* MDIS=1: Disable module before selecting clock */
+  lps_CAN->rul_MCR |= FLEXCAN_DISABLE_MASK;				/* MDIS=1: Disable module before selecting clock */
 }
 
 /**************************************************************
@@ -78,8 +79,8 @@ void flexcan_DisableFlexCANModule(S_CAN *lps_CAN){
  *  Critical/explanation : No
  **************************************************************/
 void flexcan_EnableFlexCANModule(S_CAN *lps_CAN){
-  lps_CAN->rul_MCR &= ~0x80000000;				/* MDIS=0; Enable module config. (Sets FRZ, HALT)*/
-  while (!((lps_CAN->rul_MCR & 0x1000000) >> 24));
+  lps_CAN->rul_MCR &= ~FLEXCAN_DISABLE_MASK;				/* MDIS=0; Enable module config. (Sets FRZ, HALT)*/
+  while (!((lps_CAN->rul_MCR & CAN_FROZEN_MASK) >> CAN_FROZEN_SHIFT));
                    /* Good practice: wait for FRZACK=1 on freeze mode entry/exit */
 
 }
@@ -115,11 +116,11 @@ void flexcan_ConfigControlReg(S_CAN *lps_CAN, T_ULONG lul_Config2){
  **************************************************************/
 void flexcan_ClearMessageBuffer(S_CAN *lps_CAN){
 	T_UBYTE i=0;
-	for(i=0; i<128; i++ ) {   /* CAN: clear 32 msg bufs x 4 words/msg buf = 128 words*/
-	lps_CAN->rul_RAMn[i] = 0;      /* Clear msg buf word */
+	for(i=0; i<CAN_RAMn_COUNT; i++ ) {   /* CAN: clear 32 msg bufs x 4 words/msg buf = 128 words*/
+	lps_CAN->rul_RAMn[i] = NULL;      /* Clear msg buf word */
   }
-  for(i=0; i<16; i++ ) {          /* In FRZ mode, init CAN0 16 msg buf filters */
-	lps_CAN->rul_RXIMR[i] = 0xFFFFFFFF;  /* Check all ID bits for incoming messages */
+  for(i=0; i<CAN_RXIMR_COUNT; i++ ) {          /* In FRZ mode, init CAN0 16 msg buf filters */
+	lps_CAN->rul_RXIMR[i] = INCOMING_MSG_IDS_CHECK;  /* Check all ID bits for incoming messages */
   }
 }
 
@@ -142,8 +143,8 @@ void flexcan_ConfigGlobalAccepMask(S_CAN *lps_CAN, T_ULONG lul_Mask){
  *  Critical/explanation : No
  **************************************************************/
 void flexcan_ConfigMessageBuffer(S_CAN *lps_CAN, T_UBYTE lub_MessageBoxNumber, T_ULONG lul_MessageId, T_ULONG lul_MessageConfig){
-  lps_CAN->rul_RAMn[ lub_MessageBoxNumber*MSG_BUF_SIZE + 0] = lul_MessageConfig;
-  lps_CAN->rul_RAMn[ lub_MessageBoxNumber*MSG_BUF_SIZE + 1] = lul_MessageId;
+  lps_CAN->rul_RAMn[ lub_MessageBoxNumber*MSG_BUF_SIZE + MSG_BUFF_CFG] = lul_MessageConfig;
+  lps_CAN->rul_RAMn[ lub_MessageBoxNumber*MSG_BUF_SIZE + MSG_BUFF_ID] = lul_MessageId;
 }
 
 /**************************************************************
@@ -154,10 +155,10 @@ void flexcan_ConfigMessageBuffer(S_CAN *lps_CAN, T_UBYTE lub_MessageBoxNumber, T
  *  Critical/explanation : No
  **************************************************************/
 void flexcan_ValidateConfiguration(S_CAN *lps_CAN){
-	lps_CAN->rul_MCR = 0x0000001F;       /* Negate FlexCAN 1 halt state for 32 MBs */
-	  while ((lps_CAN->rul_MCR && 0x1000000) >> 24);
+	lps_CAN->rul_MCR = RESERVE_32MB;       /* Negate FlexCAN 1 halt state for 32 MBs */
+	  while ((lps_CAN->rul_MCR && CAN_FROZEN_MASK) >> CAN_FROZEN_SHIFT);
 	                 /* Good practice: wait for FRZACK to clear (not in freeze mode) */
-	  while ((lps_CAN->rul_MCR && 0x8000000) >> 27);
+	  while ((lps_CAN->rul_MCR && CAN_NOTREADY_MASK) >> CAN_NOTREADY_SHIFT);
 	                 /* Good practice: wait for NOTRDY to clear (module ready)  */
 }
 
@@ -173,7 +174,7 @@ void flexcan_ValidateConfiguration(S_CAN *lps_CAN){
  *  Critical/explanation : No
  **************************************************************/
 void flexcan_InitFlexCAN0(){
-  rps_PCC-> raul_PCCn[PCC_FlexCAN0_INDEX] |= 0x40000000; 	/* CGC=1: enable clock to FlexCAN0 */
+  rps_PCC-> raul_PCCn[PCC_FlexCAN0_INDEX] |= ENABLE_PERIPHERAL_CLOCK; 	/* CGC=1: enable clock to FlexCAN0 */
 }
 
 /**************************************************************
@@ -184,7 +185,7 @@ void flexcan_InitFlexCAN0(){
  *  Critical/explanation : No
  **************************************************************/
 void flexcan_ClearMessageBufferFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer){
-	lps_CAN->rul_IFLAG1 = (0x00000001 << lub_MessageBuffer);       /* Clear CAN can_mb MB  flag without clearing others*/
+	lps_CAN->rul_IFLAG1 = (CLEAR_FLAG_MASK << lub_MessageBuffer);       /* Clear CAN can_mb MB  flag without clearing others*/
 }
 
 /**************************************************************
@@ -195,12 +196,12 @@ void flexcan_ClearMessageBufferFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer){
  *  Critical/explanation : No
  **************************************************************/
 void flexcan_TransmitMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_ULONG lul_MessageId, T_ULONG *lpul_TxData){
-  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + 2] = lpul_TxData[0]; /* MB word 2: data word 0 */
-  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + 3] = lpul_TxData[1]; /* MB word 3: data word 1 */
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA1] = lpul_TxData[FIRST_PART_OF_MSG]; /* MB word 2: data word 0 */
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA2] = lpul_TxData[SECOND_PART_OF_MSG]; /* MB word 3: data word 1 */
 
-  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + 1] = lul_MessageId;
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_ID] = lul_MessageId;
 
-  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + 0] = 0x0C400000 | (8 <<16); /* MB0 word 0: */
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_CFG] = TRANSMISION_ENABLE_MASK | (MSG_DLC_SIZE << DLC_SHIFT); /* MB0 word 0: */
 		                                                /* EDL,BRS,ESI=0: CANFD not used */
 		                                                /* CODE=0xC: Activate msg buf to transmit */
 		                                                /* IDE=0: Standard ID */
@@ -220,7 +221,7 @@ void flexcan_ReceiveMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_
   T_UBYTE i = 0;
 
   for (i=0; i<2; i++) {  /* Read two words of data (8 bytes) */
-	  lpul_RxData[i] = lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + 2 + i];
+	  lpul_RxData[i] = lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA1+ i];
     }
   i = lps_CAN->rul_TIMER; /* Read TIMER to unlock message buffers */
 }
@@ -233,7 +234,7 @@ void flexcan_ReceiveMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_
  *  Critical/explanation : No
  **************************************************************/
 T_UBYTE flexcan_CheckMessageBufferRxFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer){
-  return (lps_CAN->rul_IFLAG1 >> lub_MessageBuffer) & 1;
+  return (lps_CAN->rul_IFLAG1 >> lub_MessageBuffer) & TRUE;
 }
 
 
