@@ -32,6 +32,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Antonio Vazquez    |          1         |   Initial version               */
+/* Antonio Vázquez    |          2         | State Machine improved           */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -73,22 +74,19 @@ void ACU_StateMachine (void){
 
 if(FLEXCAN_msg_flag(rps_CAN0, MSG_BUF_4)){
   FLEXCAN_receive_msg(rps_CAN0, MSG_BUF_4, rx_msg_data);
-if (rx_msg_data[FIRST_PART_OF_MSG] == ENG_INACTIVE){
-	rub_ACUMode = ACU_OFF_MODE;
-	leds_ToggleBlueBoardLED();
-	FLEXCAN_transmit_msg (rps_CAN0, MSG_BUF_0, STANDARD_ID, ID_0x320, 4, rx_msg_data);
 
-
-}
-
-if (rx_msg_data[SECOND_PART_OF_MSG] == 0x11111111){
-	leds_ToggleRedBoardLED();
-}
-
-if (rx_msg_data[FIRST_PART_OF_MSG]==ENG_ACTIVE){
-	rub_ACUMode = ACU_ON_MODE;
-	leds_ToggleRedBoardLED();
-}
+  	  switch(rx_msg_data[FIRST_PART_OF_MSG]){
+  	  case ENG_INACTIVE:
+  		  rub_ACUMode = ACU_OFF_MODE;
+  		  leds_ToggleBlueBoardLED();
+  		  break;
+  	  case ENG_ACTIVE:
+  		  rub_ACUMode = ACU_ON_MODE;
+  		  leds_ToggleRedBoardLED();
+  		  break;
+  	  default:
+  		  break;
+  	  }
 }}
 
 
