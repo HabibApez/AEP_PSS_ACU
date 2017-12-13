@@ -7,7 +7,7 @@
  * $Source: main.c $
  * $Revision: version 2$
  * $Author: Habib Apez $
- * $Date: 2017-12 -10 $
+ * $Date: 2017-12 -12 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -34,7 +34,7 @@
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
 /* Habib Apez          |          2         |   Sensor Manager added to the   */
-/* Habib Apez          |          2         |   scheduler                     */
+/*                     |                    |   scheduler                     */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -47,6 +47,7 @@
 #include "HAL\clock.h"                         // OK
 #include "HAL\leds.h"                          // OK
 #include "HAL\sensors.h"                       // OK
+#include "HAL\can.h"                       	   // OK
 #include "SERVICES\Interrupts\interrupts.h"    // OK
 #include "SERVICES\Scheduler\SchM.h"           // OK
 #include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
@@ -77,7 +78,7 @@ void SysTick_Handler(void);
 void SysTick_Handler(void){
   if (NULL!= GlbSysTickCallback)
 	  GlbSysTickCallback();
-  // leds_ToggleBlueBoardLED();
+   leds_ToggleBlueBoardLED();
 }
 
 /**************************************************************
@@ -88,14 +89,13 @@ void SysTick_Handler(void){
  *  Critical/explanation : No
  **************************************************************/
  int main(void){
+
   clock_InitClock();
   leds_InitBoardLeds();
   leds_InitLeds();
   sensor_InitSensors();
 
- // for(;;){
- //   sensorsm_StateMachine();
- // }
+  can_InitCAN0();
 
   SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
   SchM_Start();		        /* Start Scheduler Services */

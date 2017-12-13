@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: sensors.h $
+ * $Source: ACU_StateMachine.h $
  * $Revision: version 1 $
- * $Author: Habib Apez $
- * $Date: 2017-12-07  $
+ * $Author: Antonio Vazquez $
+ * $Date: 2017-12-09 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \sensors.h
-    Header file for sensors module. Located at HAL.
+/** \ACU_StateMachine
+    Header file for ACU_StateMachine. Located at APP.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -32,38 +32,34 @@
 /*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Habib Apez          |          1         |   Initial version               */
+/* Antonio Vazquez    |          1         |   Initial version               */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: sensors.h  $
+ * $Log: ACU_StateMachine.h  $
   ============================================================================*/
-#ifndef __SENSORS_H
-#define __SENSORS_H
+#ifndef __ACU_H
+#define __ACU_H
 
 /* Includes */
 /*============================================================================*/
-#include "MCAL\io.h"
-#include "MCAL\pcc.h"
-#include "MCAL\port.h"
-#include "MCAL\adc.h"
+#include "HAL\Communication.h"
 
 /* Constants and types */
 /*============================================================================*/
-#define DRIVER_SEAT_BELT_SENSOR		1	/* ADC Channel 1, PTA[1], Driver Seat Belt Sensor */
-#define PASSENGER_SEAT_BELT_SENSOR	0	/* ADC Channel 0, PTA[0], Passenger Seat Belt Sensor */
-#define PASSENGER_SEAT_SENSOR		3	/* ADC Channel 3, PTA[7], Passenger Seat Sensor */
+enum{
+	ACU_OFF_MODE = 0,
+	ACU_ON_MODE =1,
+	ENG_ACTIVE =0x01010101,
+	ENG_INACTIVE = 0x00000000
+};
 
 /* Exported Variables */
 /*============================================================================*/
 
 /* Exported functions prototypes */
 /*============================================================================*/
-void sensor_InitSensors(void);
-T_UWORD sensor_ReadDriverSeatBeltSensor(void);
-T_UWORD sensor_ReadPassengerSeatBeltSensor(void);
-T_UWORD sensor_ReadPassengerSeatSensor(void);
-T_UWORD sensor_ReadSensor(T_UBYTE lub_Sensor);
+void ACU_StateMachine(void);
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

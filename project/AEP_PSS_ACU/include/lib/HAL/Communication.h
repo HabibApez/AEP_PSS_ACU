@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: sensors.h $
+ * $Source: Communication.h $
  * $Revision: version 1 $
- * $Author: Habib Apez $
- * $Date: 2017-12-07  $
+ * $Author: Antonio Vazquez $
+ * $Date: 2017-12-08 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \sensors.h
-    Header file for sensors module. Located at HAL.
+/** \Communication
+    Header file for CAN BUS Communication. Located at HAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -32,38 +32,40 @@
 /*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Habib Apez          |          1         |   Initial version               */
+/* Antonio Vazquez    |          1         |   Initial version               */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: sensors.h  $
+ * $Log: Communication.h  $
   ============================================================================*/
-#ifndef __SENSORS_H
-#define __SENSORS_H
+#ifndef __COMMUNICATION_H
+#define __COMMUNICATION_H
 
 /* Includes */
 /*============================================================================*/
-#include "MCAL\io.h"
-#include "MCAL\pcc.h"
-#include "MCAL\port.h"
-#include "MCAL\adc.h"
+#include "MCAL\FlexCan.h"
 
 /* Constants and types */
 /*============================================================================*/
-#define DRIVER_SEAT_BELT_SENSOR		1	/* ADC Channel 1, PTA[1], Driver Seat Belt Sensor */
-#define PASSENGER_SEAT_BELT_SENSOR	0	/* ADC Channel 0, PTA[0], Passenger Seat Belt Sensor */
-#define PASSENGER_SEAT_SENSOR		3	/* ADC Channel 3, PTA[7], Passenger Seat Sensor */
+#define FLAG_READY_MASK     0x00000001u
+#define FIRST_PART_OF_MSG   0u
+#define SECOND_PART_OF_MSG  1u
+#define ENABLE_TRANSMITION  0x0C000000u
+#define TRANSMISION_FRAME   0x00400000u
+#define CAN_WMBn_CS_DLC_SHIFT  16u
+
+
+#define ACTIVE				1
+#define INACTIVE			2
 
 /* Exported Variables */
 /*============================================================================*/
 
 /* Exported functions prototypes */
 /*============================================================================*/
-void sensor_InitSensors(void);
-T_UWORD sensor_ReadDriverSeatBeltSensor(void);
-T_UWORD sensor_ReadPassengerSeatBeltSensor(void);
-T_UWORD sensor_ReadPassengerSeatSensor(void);
-T_UWORD sensor_ReadSensor(T_UBYTE lub_Sensor);
+void FLEXCAN_init(S_CAN_Type *CAN);
+void FLEXCAN_transmit_msg (S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA);
+void FLEXCAN_receive_msg(S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG *RxDATA);
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

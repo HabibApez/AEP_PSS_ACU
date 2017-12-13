@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: sensors.h $
+ * $Source: ACU_StateMachine.c $
  * $Revision: version 1 $
- * $Author: Habib Apez $
- * $Date: 2017-12-07  $
+ * $Author: Antonio Vazquez $
+ * $Date: 2017-12-09 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \sensors.h
-    Header file for sensors module. Located at HAL.
+/** \ACU_StateMachine.c
+    State Machine function for the ACU. Located at APP.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -29,41 +29,68 @@
 /*============================================================================*/
 /*                    REUSE HISTORY - taken over from                         */
 /*============================================================================*/
-/*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Habib Apez          |          1         |   Initial version               */
+/* Antonio Vazquez    |          1         |   Initial version               */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: sensors.h  $
+ * $Log: ACU_StateMachine.c  $
   ============================================================================*/
-#ifndef __SENSORS_H
-#define __SENSORS_H
 
 /* Includes */
 /*============================================================================*/
-#include "MCAL\io.h"
-#include "MCAL\pcc.h"
-#include "MCAL\port.h"
-#include "MCAL\adc.h"
+#include "SERVICES\CAN\CAN_Services.h"
 
-/* Constants and types */
-/*============================================================================*/
-#define DRIVER_SEAT_BELT_SENSOR		1	/* ADC Channel 1, PTA[1], Driver Seat Belt Sensor */
-#define PASSENGER_SEAT_BELT_SENSOR	0	/* ADC Channel 0, PTA[0], Passenger Seat Belt Sensor */
-#define PASSENGER_SEAT_SENSOR		3	/* ADC Channel 3, PTA[7], Passenger Seat Sensor */
-
-/* Exported Variables */
+/* Constants and types  */
 /*============================================================================*/
 
-/* Exported functions prototypes */
+/* Variables */
 /*============================================================================*/
-void sensor_InitSensors(void);
-T_UWORD sensor_ReadDriverSeatBeltSensor(void);
-T_UWORD sensor_ReadPassengerSeatBeltSensor(void);
-T_UWORD sensor_ReadPassengerSeatSensor(void);
-T_UWORD sensor_ReadSensor(T_UBYTE lub_Sensor);
+T_UBYTE rub_ACUMode = 0;
 
-#endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */
+/* Private functions prototypes */
+/*============================================================================*/
+
+/* Inline functions */
+/*============================================================================*/
+
+/* Private functions */
+/*============================================================================*/
+
+/* Exported functions */
+/*============================================================================*/
+/**************************************************************
+ *  Name                 : ACU_StateMachine
+ *  Description          : Manager the main function for the ACU module.
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void ACU_StateMachine (void){
+  T_ULONG rx_msg_data[2];
+
+if(FLEXCAN_msg_flag(rps_CAN0, MSG_BUF_4)){
+  FLEXCAN_receive_msg(rps_CAN0, MSG_BUF_4, rx_msg_data);
+if (rx_msg_data[FIRST_PART_OF_MSG] == ENG_INACTIVE){
+	rub_ACUMode = ACU_OFF_MODE;
+	leds_ToggleBlueBoardLED();
+	FLEXCAN_transmit_msg (rps_CAN0, MSG_BUF_0, STANDARD_ID, ID_0x320, 4, rx_msg_data);
+
+
+}
+
+if (rx_msg_data[SECOND_PART_OF_MSG] == 0x11111111){
+	leds_ToggleRedBoardLED();
+}
+
+if (rx_msg_data[FIRST_PART_OF_MSG]==ENG_ACTIVE){
+	rub_ACUMode = ACU_ON_MODE;
+	leds_ToggleRedBoardLED();
+}
+}}
+
+
+
+ /* Notice: the file ends with a blank new line to avoid compiler warnings */

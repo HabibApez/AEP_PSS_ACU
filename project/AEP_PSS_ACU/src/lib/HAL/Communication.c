@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: sensors.c $
- * $Revision: version 2 $
- * $Author: Habib Apez $
- * $Date: 2017-12-12 $
+ * $Source: Communication.c $
+ * $Revision: version 1 $
+ * $Author: Antonio Vazquez $
+ * $Date: 2017-12-08 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \sensors.c
-    sensors module file for SK32144 uC. Located at MCAL.
+/** \Communication.c
+    CAN BUS Communication. Located at HAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -29,21 +29,19 @@
 /*============================================================================*/
 /*                    REUSE HISTORY - taken over from                         */
 /*============================================================================*/
-/*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Habib Apez          |          1         |   Initial version               */
-/* Habib Apez          |          2         |   General Read Sensor function  */
+/* Antonio Vazquez    |          1         |   Initial version               */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: sensors.c  $
+ * $Log: Communication.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "HAL\sensors.h"
+#include "HAL\Communication.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -63,59 +61,64 @@
 /* Exported functions */
 /*============================================================================*/
 /**************************************************************
- *  Name                 : sensor_InitSensors
- *  Description          : Configures the ADC and 3 inputs for the sensors
+ *  Name                 : FLEXCAN0_init
+ *  Description          : Initialize the CAN0 BUS
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void sensor_InitSensors(void){
-  adc_InitADC(rps_ADC0, PCC_ADC0_INDEX);
+void FLEXCAN_init(S_CAN_Type *CAN){
+ConfigureCAN(CAN, PCC_FlexCAN0_INDEX);
+CHECK_MB_ID (CAN, CHECK_ALL_ID);
+ACCEPTANCE_MB_ID (CAN, GLOBAL_ACCEPTANCE_MASK);
+Configure_Receiver(CAN, MSG_BUF_4, STANDARD_ID, ID_0x511);
+Configure_Receiver(CAN, MSG_BUF_1, STANDARD_ID, ID_0x320);
+EnableCan(CAN); /*To change the number of MB reserved, a modification to this function is required.
+                      *located at MCAL/FlexCan.c */
 }
 
 /**************************************************************
- *  Name                 : sensor_ReadSensor
- *  Description          : Read the voltage of indicated Sensor in mv
- *  Parameters           : [T_UBYTE lub_Sensor]
- *  Return               : T_UWORD
+ *  Name                 : FLEXCAN0_transmit_msg
+ *  Description          : Transmit a message through CAN BUS
+ *  Parameters           : [S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA]
+ *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-T_UWORD sensor_ReadSensor(T_UBYTE lub_Sensor){
-  return adc_ReadADCChannel(rps_ADC0, lub_Sensor);
+void FLEXCAN_transmit_msg (S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA){
+        CAN->rul_IFLAG1 = FLAG_READY_MASK << can_mb;
+
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA1] = TxDATA[FIRST_PART_OF_MSG];
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA2] = TxDATA[SECOND_PART_OF_MSG];
+
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_ID] = CAN_Id;
+
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_CFG] = ENABLE_TRANSMITION | TRANSMISION_FRAME | ID_Type | DLC << CAN_WMBn_CS_DLC_SHIFT;
+
 }
 
-/**************************************************************
- *  Name                 : sensor_ReadDriverSeatBeltSensor
- *  Description          : Read the voltage of the Driver Seat Belt Sensor in mv
- *  Parameters           : [void]
- *  Return               : T_UWORD
- *  Critical/explanation : No
- **************************************************************/
-T_UWORD sensor_ReadDriverSeatBeltSensor(void){
-  return adc_ReadADCChannel(rps_ADC0, DRIVER_SEAT_BELT_SENSOR);
-}
 
-/**************************************************************
- *  Name                 : sensor_ReadPassengerSeatBeltSensor
- *  Description          : Read the voltage of the Passenger Seat Belt Sensor in mv
- *  Parameters           : [void]
- *  Return               : T_UWORD
- *  Critical/explanation : No
- **************************************************************/
-T_UWORD sensor_ReadPassengerSeatBeltSensor(void){
-  return adc_ReadADCChannel(rps_ADC0, PASSENGER_SEAT_BELT_SENSOR);
-}
+ /**************************************************************
+  *  Name                 : FLEXCAN0_receive_msg
+  *  Description          : Receives a message through CAN BUS
+  *  Parameters           : [S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA]
+  *  Return               : void
+  *  Critical/explanation : No
+  **************************************************************/
+  void FLEXCAN_receive_msg(S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG *RxDATA){
+ RxDATA[FIRST_PART_OF_MSG] = CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA1];
+ RxDATA[SECOND_PART_OF_MSG] = CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA2];
+ CAN->rul_IFLAG1 = FLAG_READY_MASK << can_mb;
+  }
 
-/**************************************************************
- *  Name                 : sensor_ReadPassengerSeatSensor
- *  Description          : Read the voltage of the Passenger Seat Sensor in mv
- *  Parameters           : [void]
- *  Return               : T_UWORD
- *  Critical/explanation : No
- **************************************************************/
-T_UWORD sensor_ReadPassengerSeatSensor(void){
-  return adc_ReadADCChannel(rps_ADC0, PASSENGER_SEAT_SENSOR);
-}
-
+  /**************************************************************
+   *  Name                 : FLEXCAN0_msg_flag
+   *  Description          : Read msg flag to determinate waiting messages
+   *  Parameters           : [S_CAN_Type *CAN, const T_UBYTE can_mb]
+   *  Return               : void
+   *  Critical/explanation : No
+   **************************************************************/
+   T_UBYTE FLEXCAN_msg_flag(S_CAN_Type *CAN, const T_UBYTE can_mb){
+	   return ((CAN->rul_IFLAG1>> can_mb) & ACTIVE);
+   }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */
