@@ -86,14 +86,10 @@ EnableCan(CAN); /*To change the number of MB reserved, a modification to this fu
  **************************************************************/
 void FLEXCAN_transmit_msg (S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA){
         CAN->rul_IFLAG1 = FLAG_READY_MASK << can_mb;
-
         CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA1] = TxDATA[FIRST_PART_OF_MSG];
         CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA2] = TxDATA[SECOND_PART_OF_MSG];
-
         CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_ID] = CAN_Id;
-
         CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_CFG] = ENABLE_TRANSMITION | TRANSMISION_FRAME | ID_Type | DLC << CAN_WMBn_CS_DLC_SHIFT;
-
 }
 
 

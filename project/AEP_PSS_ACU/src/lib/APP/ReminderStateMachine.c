@@ -4,16 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
- * $Revision: version 2$
- * $Author: Habib Apez $
- * $Date: 2017-12 -10 $
+ * $Source: ACU_StateMachine.c $
+ * $Revision: version 1 $
+ * $Author: Antonio Vazquez $
+ * $Date: 2017-12-09 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
-    Main at APP in Scheduler.
-    Window Lifter project main with Scheduler and State Machines.
+/** \DSBR.c
+    State Machine function for the Driver Seat Belt Reminder. Located at APP
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -32,26 +31,18 @@
 /*============================================================================*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Habib Apez          |          1         |   Initial version               */
-/* Habib Apez          |          2         |   Sensor Manager added to the   */
-/* Habib Apez          |          2         |   scheduler                     */
+/* Antonio Vazquez    |          1         |   Initial version               */
+/* Antonio Vázquez    |          2         | State Machine improved           */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: DSBR.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include <SERVICES/Communication/CAN_Services.h>
-#include "HAL\clock.h"                         // OK
-#include "HAL\leds.h"                          // OK
-#include "HAL\sensors.h"                       // OK
-#include "SERVICES\Interrupts\interrupts.h"    // OK
-#include "SERVICES\Scheduler\SchM.h"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
-#include "MCAL\io.h"
+#include "APP/ReminderStateMachine.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -59,64 +50,52 @@
 /* Variables */
 /*============================================================================*/
 
+
 /* Private functions prototypes */
 /*============================================================================*/
-void SysTick_Handler(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
+
+/* Exported functions */
+/*============================================================================*/
 /**************************************************************
- *  Name                 : SystTick interruption
- *  Description          : Moves the Window upwards
+ *  Name                 : ACU_StateMachine
+ *  Description          : Manager the main function for the ACU module.
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void SysTick_Handler(void){
-  if (NULL!= GlbSysTickCallback)
-	  GlbSysTickCallback();
-   leds_ToggleBlueBoardLED();
-}
+void ACU_StateMachine (void){
+  T_ULONG rx_msg_data[2];
 
-/**************************************************************
- *  Name                 : main
- *  Description          : Implements the main function
- *  Parameters           : [void]
- *  Return               : voidx
- *  Critical/explanation : No
- **************************************************************/
- int main(void){
+if(FLEXCAN_msg_flag(rps_CAN0, MSG_BUF_4)){
+  FLEXCAN_receive_msg(rps_CAN0, MSG_BUF_4, rx_msg_data);
 
-  clock_InitClock();
-  leds_InitBoardLeds();
-  leds_InitLeds();
-  sensor_InitSensors();
-
-
-FLEXCAN_init(rps_CAN0);
-
- for(;;){
-	 ACU_StateMachine();
-	     }
+  	  switch(rx_msg_data[FIRST_PART_OF_MSG]){
+  	  case ENG_INACTIVE:
+  		  rub_ACUMode = ACU_OFF_MODE;
+  		  leds_ToggleBlueBoardLED();
+  		  break;
+  	  case ENG_ACTIVE:
+  		  rub_ACUMode = ACU_ON_MODE;
+  		  leds_ToggleRedBoardLED();
+  		  break;
+  	  default:
+  		  break;
+  	  }
+}}
 
 
-
-
- SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
- SchM_Start();		        /* Start Scheduler Services */
-
-  for(;;){
-    // Do nothing
-  }
-
-  return 0;
-}
-
-/* Exported functions */
-/*============================================================================*/
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */
+
+ *
+ *  Created on: 13/12/2017
+ *      Author: uidn8311
+ */
+
 
