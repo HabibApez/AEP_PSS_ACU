@@ -4,16 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
- * $Revision: version 2$
- * $Author: Habib Apez $
- * $Date: 2017-12 -10 $
+ * $Source: ACU_StateMachine.h $
+ * $Revision: version 1 $
+ * $Author: Antonio Vazquez $
+ * $Date: 2017-12-09 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
-    Main at APP in Scheduler.
-    Window Lifter project main with Scheduler and State Machines.
+/** \ACU_StateMachine
+    Header file for ACU_StateMachine. Located at APP.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -30,93 +29,37 @@
 /*============================================================================*/
 /*                    REUSE HISTORY - taken over from                         */
 /*============================================================================*/
+/*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Habib Apez          |          1         |   Initial version               */
-/* Habib Apez          |          2         |   Sensor Manager added to the   */
-/* Habib Apez          |          2         |   scheduler                     */
+/* Antonio Vazquez    |          1         |   Initial version               */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: ACU_StateMachine.h  $
   ============================================================================*/
+#ifndef __ACU_H
+#define __ACU_H
 
 /* Includes */
 /*============================================================================*/
-#include "HAL\clock.h"                         // OK
-#include "HAL\leds.h"                          // OK
-#include "HAL\sensors.h"                       // OK
-#include "SERVICES\Interrupts\interrupts.h"    // OK
-#include "SERVICES\Scheduler\SchM.h"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
-#include "SERVICES\CAN\CAN_Services.h"
-#include "MCAL\io.h"
+#include "HAL\Communication.h"
 
-/* Constants and types  */
+/* Constants and types */
+/*============================================================================*/
+enum{
+	ACU_OFF_MODE = 0,
+	ACU_ON_MODE =1,
+	ENG_ACTIVE =0x01010101,
+	ENG_INACTIVE = 0x00000000
+};
+
+/* Exported Variables */
 /*============================================================================*/
 
-/* Variables */
+/* Exported functions prototypes */
 /*============================================================================*/
+void ACU_StateMachine(void);
 
-/* Private functions prototypes */
-/*============================================================================*/
-void SysTick_Handler(void);
-
-/* Inline functions */
-/*============================================================================*/
-
-/* Private functions */
-/*============================================================================*/
-/**************************************************************
- *  Name                 : SystTick interruption
- *  Description          : Moves the Window upwards
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SysTick_Handler(void){
-  if (NULL!= GlbSysTickCallback)
-	  GlbSysTickCallback();
-   leds_ToggleBlueBoardLED();
-}
-
-/**************************************************************
- *  Name                 : main
- *  Description          : Implements the main function
- *  Parameters           : [void]
- *  Return               : voidx
- *  Critical/explanation : No
- **************************************************************/
- int main(void){
-
-  clock_InitClock();
-  leds_InitBoardLeds();
-  leds_InitLeds();
-  sensor_InitSensors();
-
-
-FLEXCAN_init(rps_CAN0);
-
- for(;;){
-	 ACU_StateMachine();
-	     }
-
-
-
-
- SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
- SchM_Start();		        /* Start Scheduler Services */
-
-  for(;;){
-    // Do nothing
-  }
-
-  return 0;
-}
-
-/* Exported functions */
-/*============================================================================*/
-
- /* Notice: the file ends with a blank new line to avoid compiler warnings */
-
+#endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

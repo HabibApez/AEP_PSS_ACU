@@ -4,16 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: main.c $
- * $Revision: version 2$
- * $Author: Habib Apez $
- * $Date: 2017-12 -10 $
+ * $Source: Communication.h $
+ * $Revision: version 1 $
+ * $Author: Antonio Vazquez $
+ * $Date: 2017-12-08 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \main.c
-    Main at APP in Scheduler.
-    Window Lifter project main with Scheduler and State Machines.
+/** \Communication
+    Header file for CAN BUS Communication. Located at HAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -30,93 +29,43 @@
 /*============================================================================*/
 /*                    REUSE HISTORY - taken over from                         */
 /*============================================================================*/
+/*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Habib Apez          |          1         |   Initial version               */
-/* Habib Apez          |          2         |   Sensor Manager added to the   */
-/* Habib Apez          |          2         |   scheduler                     */
+/* Antonio Vazquez    |          1         |   Initial version               */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: main.c  $
+ * $Log: Communication.h  $
   ============================================================================*/
+#ifndef __COMMUNICATION_H
+#define __COMMUNICATION_H
 
 /* Includes */
 /*============================================================================*/
-#include "HAL\clock.h"                         // OK
-#include "HAL\leds.h"                          // OK
-#include "HAL\sensors.h"                       // OK
-#include "SERVICES\Interrupts\interrupts.h"    // OK
-#include "SERVICES\Scheduler\SchM.h"           // OK
-#include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
-#include "SERVICES\CAN\CAN_Services.h"
-#include "MCAL\io.h"
+#include "MCAL\FlexCan.h"
 
-/* Constants and types  */
+/* Constants and types */
+/*============================================================================*/
+#define FLAG_READY_MASK     0x00000001u
+#define FIRST_PART_OF_MSG   0u
+#define SECOND_PART_OF_MSG  1u
+#define ENABLE_TRANSMITION  0x0C000000u
+#define TRANSMISION_FRAME   0x00400000u
+#define CAN_WMBn_CS_DLC_SHIFT  16u
+
+
+#define ACTIVE				1
+#define INACTIVE			2
+
+/* Exported Variables */
 /*============================================================================*/
 
-/* Variables */
+/* Exported functions prototypes */
 /*============================================================================*/
+void FLEXCAN_init(S_CAN_Type *CAN);
+void FLEXCAN_transmit_msg (S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA);
+void FLEXCAN_receive_msg(S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG *RxDATA);
 
-/* Private functions prototypes */
-/*============================================================================*/
-void SysTick_Handler(void);
-
-/* Inline functions */
-/*============================================================================*/
-
-/* Private functions */
-/*============================================================================*/
-/**************************************************************
- *  Name                 : SystTick interruption
- *  Description          : Moves the Window upwards
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SysTick_Handler(void){
-  if (NULL!= GlbSysTickCallback)
-	  GlbSysTickCallback();
-   leds_ToggleBlueBoardLED();
-}
-
-/**************************************************************
- *  Name                 : main
- *  Description          : Implements the main function
- *  Parameters           : [void]
- *  Return               : voidx
- *  Critical/explanation : No
- **************************************************************/
- int main(void){
-
-  clock_InitClock();
-  leds_InitBoardLeds();
-  leds_InitLeds();
-  sensor_InitSensors();
-
-
-FLEXCAN_init(rps_CAN0);
-
- for(;;){
-	 ACU_StateMachine();
-	     }
-
-
-
-
- SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
- SchM_Start();		        /* Start Scheduler Services */
-
-  for(;;){
-    // Do nothing
-  }
-
-  return 0;
-}
-
-/* Exported functions */
-/*============================================================================*/
-
- /* Notice: the file ends with a blank new line to avoid compiler warnings */
-
+#endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

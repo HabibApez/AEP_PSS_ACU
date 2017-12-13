@@ -96,6 +96,10 @@ typedef struct {
 #define PCC_LPUART2_INDEX                        108
 #define PCC_CMP0_INDEX                           115
 
+
+/*MASKS*/
+#define PCC_PCCn_CGC_MASK                        0x40000000u
+
 /* Exported Variables */
 /*============================================================================*/
 /** Pointer to S_PCC */
