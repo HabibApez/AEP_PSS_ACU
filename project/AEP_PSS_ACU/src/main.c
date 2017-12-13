@@ -7,7 +7,7 @@
  * $Source: main.c $
  * $Revision: version 2$
  * $Author: Habib Apez $
- * $Date: 2017-12 -10 $
+ * $Date: 2017-12 -12 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -34,7 +34,7 @@
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
 /* Habib Apez          |          2         |   Sensor Manager added to the   */
-/* Habib Apez          |          2         |   scheduler                     */
+/*                     |                    |   scheduler                     */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -47,17 +47,11 @@
 #include "HAL\clock.h"                         // OK
 #include "HAL\leds.h"                          // OK
 #include "HAL\sensors.h"                       // OK
+#include "HAL\can.h"                       	   // OK
 #include "SERVICES\Interrupts\interrupts.h"    // OK
 #include "SERVICES\Scheduler\SchM.h"           // OK
 #include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
-<<<<<<< HEAD
 
-#include "HAL\can.h"                       // OK
-
-=======
-#include "SERVICES\CAN\CAN_Services.h"
-#include "MCAL\io.h"
->>>>>>> cfb5288b5af9915335de26f3996659293200c996
 
 /* Constants and types  */
 /*============================================================================*/
@@ -91,7 +85,7 @@ void SysTick_Handler(void){
  *  Name                 : main
  *  Description          : Implements the main function
  *  Parameters           : [void]
- *  Return               : voidx
+ *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
  int main(void){
@@ -101,48 +95,10 @@ void SysTick_Handler(void){
   leds_InitLeds();
   sensor_InitSensors();
 
-
-<<<<<<< HEAD
   can_InitCAN0();
 
-  /*
-  for(;;){
-	leds_TurnOffDownLED();
-	leds_TurnOffAntipinchLED();
-	if(1 == can_CheckMessageArrivalCAN0(RX_MSG1_BUFF)){
-	  leds_TurnOnDownLED();
-	  leds_TurnOffAntipinchLED();
-      can_ReceiveMessageCAN0(RX_MSG1_BUFF, rul_RxMessageData);
-      rul_TxMessageData[0] = rul_RxMessageData[0];
-      rul_TxMessageData[1] = rul_RxMessageData[1];
-	  can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
-	}
-	if(1 == can_CheckMessageArrivalCAN0(RX_MSG2_BUFF)){
-	  leds_TurnOffDownLED();
-      leds_TurnOnAntipinchLED();
-      can_ReceiveMessageCAN0(RX_MSG2_BUFF, rul_RxMessageData);
-      rul_TxMessageData[0] = rul_RxMessageData[0];
-      rul_TxMessageData[1] = rul_RxMessageData[1];
-      can_TransmitMessageCAN0(TX_MSG2_BUFF, TX_MSG2_ID, rul_TxMessageData);
-	}
-  }
-
-*/
   SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
   SchM_Start();		        /* Start Scheduler Services */
-=======
-FLEXCAN_init(rps_CAN0);
-
- for(;;){
-	 ACU_StateMachine();
-	     }
-
-
-
-
- SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
- SchM_Start();		        /* Start Scheduler Services */
->>>>>>> cfb5288b5af9915335de26f3996659293200c996
 
   for(;;){
     // Do nothing
