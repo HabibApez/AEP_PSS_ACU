@@ -69,33 +69,8 @@
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void ACU_StateMachine (void){
-  T_ULONG rx_msg_data[2];
 
-if(FLEXCAN_msg_flag(rps_CAN0, MSG_BUF_4)){
-  FLEXCAN_receive_msg(rps_CAN0, MSG_BUF_4, rx_msg_data);
-
-  	  switch(rx_msg_data[FIRST_PART_OF_MSG]){
-  	  case ENG_INACTIVE:
-  		  rub_ACUMode = ACU_OFF_MODE;
-  		  leds_ToggleBlueBoardLED();
-  		  break;
-  	  case ENG_ACTIVE:
-  		  rub_ACUMode = ACU_ON_MODE;
-  		  leds_ToggleRedBoardLED();
-  		  break;
-  	  default:
-  		  break;
-  	  }
-}}
 
 
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */
-
- *
- *  Created on: 13/12/2017
- *      Author: uidn8311
- */
-
-

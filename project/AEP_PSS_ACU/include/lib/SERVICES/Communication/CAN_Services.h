@@ -44,10 +44,13 @@
 
 /* Includes */
 /*============================================================================*/
-#include "HAL\Communication.h"
+#include "HAL\can.h"
 
 /* Constants and types */
 /*============================================================================*/
+
+#define FIRST_PART_OF_MSG    0
+#define SECOND_PART_OF_MSG	1
 enum{
 	ACU_OFF_MODE = 0,
 	ACU_ON_MODE =1,

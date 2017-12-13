@@ -32,7 +32,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Antonio Vazquez    |          1         |   Initial version               */
-/* Antonio Vázquez    |          2         | State Machine improved           */
+/* Antonio Vï¿½zquez    |          2         | State Machine improved           */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -72,8 +72,7 @@ T_UBYTE rub_ACUMode = 0;
 void ACU_StateMachine (void){
   T_ULONG rx_msg_data[2];
 
-if(FLEXCAN_msg_flag(rps_CAN0, MSG_BUF_4)){
-  FLEXCAN_receive_msg(rps_CAN0, MSG_BUF_4, rx_msg_data);
+  can_ReceiveMessageCAN0(RX_MSG1_BUFF, rx_msg_data);
 
   	  switch(rx_msg_data[FIRST_PART_OF_MSG]){
   	  case ENG_INACTIVE:
@@ -86,7 +85,6 @@ if(FLEXCAN_msg_flag(rps_CAN0, MSG_BUF_4)){
   		  break;
   	  default:
   		  break;
-  	  }
 }}
 
 
