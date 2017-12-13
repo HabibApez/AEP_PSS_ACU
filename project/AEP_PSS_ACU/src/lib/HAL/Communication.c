@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: FlexCan.c $
- * $Revision: version  $
- * $Author: Antonio vazquez $
+ * $Source: Communication.c $
+ * $Revision: version 1 $
+ * $Author: Antonio Vazquez $
  * $Date: 2017-12-08 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \FlexCan.c
-    Flex Can module file for SK32144 uC. Located at MCAL.
+/** \Communication.c
+    CAN BUS Communication. Located at HAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -36,20 +36,18 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: FlexCan.c  $
+ * $Log: Communication.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "MCAL\FlexCan.h"
-#include "MCAL\port.h"
+#include "HAL\Communication.h"
 
 /* Constants and types  */
 /*============================================================================*/
 
 /* Variables */
 /*============================================================================*/
-
 
 /* Private functions prototypes */
 /*============================================================================*/
@@ -63,89 +61,64 @@
 /* Exported functions */
 /*============================================================================*/
 /**************************************************************
- *  Name                 : EnableCAN
- *  Description          : Configures the CAN
- *  Parameters           : [S_CAN_Type *CAN]
+ *  Name                 : FLEXCAN0_init
+ *  Description          : Initialize the CAN0 BUS
+ *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-S_CAN_Type *CANStructure;
-void ConfigureCAN (S_CAN_Type *CAN, T_UBYTE INDEX){
-  T_ULONG i=0;
-  rps_PCC->raul_PCCn[INDEX] |= PCC_PCCn_CGC_MASK;
-  CAN->rul_MCR |= CAN_MCR_MDIS_MASK;
-  CAN->rul_CTRL1 &= ~CAN_CTRL1_CLKSRC_MASK;  /* CLKSRC=0: Clock Source = oscillator (8 MHz) */
-  CAN->rul_MCR &= ~CAN_MCR_MDIS_MASK;        /* MDIS=0; Enable module config. (Sets FRZ, HALT)*/
-  while (!((CAN->rul_MCR & CAN_MCR_FRZACK_MASK) >> CAN_MCR_FRZACK_SHIFT))  {}
-                 /* Good practice: wait for FRZACK=1 on freeze mode entry/exit */
-  CAN->rul_CTRL1 = CAN_MASK_500KHz; /* Configure for 500 KHz bit time */
-                            /* Time quanta freq = 16 time quanta x 500 KHz bit time= 8MHz */
-                            /* PRESDIV+1 = Fclksrc/Ftq = 8 MHz/8 MHz = 1 */
-                            /*    so PRESDIV = 0 */
-                            /* PSEG2 = Phase_Seg2 - 1 = 4 - 1 = 3 */
-                            /* PSEG1 = PSEG2 = 3 */
-                            /* PROPSEG= Prop_Seg - 1 = 7 - 1 = 6 */
-                            /* RJW: since Phase_Seg2 >=4, RJW+1=4 so RJW=3. */
-                            /* SMP = 1: use 3 bits per CAN sample */
-                            /* CLKSRC=0 (unchanged): Fcanclk= Fosc= 8 MHz */
-  for(i=0; i<CAN_RAMn_COUNT; i++ ) {   /* CAN0: clear 32 msg bufs x 4 words/msg buf = 128 words*/
-    CAN->raul_RAMn[i] = NULL;      /* Clear msg buf word */
-  }
+void FLEXCAN_init(S_CAN_Type *CAN){
+ConfigureCAN(CAN, PCC_FlexCAN0_INDEX);
+CHECK_MB_ID (CAN, CHECK_ALL_ID);
+ACCEPTANCE_MB_ID (CAN, GLOBAL_ACCEPTANCE_MASK);
+Configure_Receiver(CAN, MSG_BUF_4, STANDARD_ID, ID_0x511);
+Configure_Receiver(CAN, MSG_BUF_1, STANDARD_ID, ID_0x320);
+EnableCan(CAN); /*To change the number of MB reserved, a modification to this function is required.
+                      *located at MCAL/FlexCan.c */
 }
 
 /**************************************************************
- *  Name                 : CHECK_MB_ID
- *  Description          : Check the ID bits
- *  Parameters           : [S_CAN_Type *CAN, T_UBYTE ID]
+ *  Name                 : FLEXCAN0_transmit_msg
+ *  Description          : Transmit a message through CAN BUS
+ *  Parameters           : [S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void CHECK_MB_ID (S_CAN_Type *CAN, T_ULONG ID){
-  T_ULONG i=0;
-  for(i=0; i<16; i++ ) {          /* In FRZ mode, init CAN0 16 msg buf filters */
-    CAN->raul_RXIMR[i] = ID;  /* Check all ID bits for incoming messages */
-  }
+void FLEXCAN_transmit_msg (S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA){
+        CAN->rul_IFLAG1 = FLAG_READY_MASK << can_mb;
+
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA1] = TxDATA[FIRST_PART_OF_MSG];
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA2] = TxDATA[SECOND_PART_OF_MSG];
+
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_ID] = CAN_Id;
+
+        CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_CFG] = ENABLE_TRANSMITION | TRANSMISION_FRAME | ID_Type | DLC << CAN_WMBn_CS_DLC_SHIFT;
+
 }
 
-/**************************************************************
- *  Name                 : ACCEPTANCE_MB_ID
- *  Description          : Configures the MB to be accepted
- *  Parameters           : [S_CAN_Type *CAN, T_UBYTE ID]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void ACCEPTANCE_MB_ID (S_CAN_Type *CAN, T_ULONG ID){
-  CAN->rul_RXMGMASK = ID;
-}
-
-/**************************************************************
- *  Name                 : Configure_Receiver
- *  Description          : Configures a MB to receives messages
- *  Parameters           : [S_CAN_Type *CAN, T_UBYTE MB, T_UBYTE ID_Type, T_UBYTE ID]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
- void Configure_Receiver (S_CAN_Type *CAN, T_UBYTE MB, T_ULONG ID_Type, T_ULONG ID){
-   CAN->raul_RAMn[ MB*MSG_BUF_SIZE + MSG_BUF_CFG] = ENABLE_RECEPTION | ID_Type;
-   CAN->raul_RAMn[ MB*MSG_BUF_SIZE + MSG_BUF_ID] = ID;
- }
 
  /**************************************************************
-  *  Name                 : EnableCAN
-  *  Description          : Enables the CAN
-  *  Parameters           : [S_CAN_Type *CAN]
+  *  Name                 : FLEXCAN0_receive_msg
+  *  Description          : Receives a message through CAN BUS
+  *  Parameters           : [S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA]
   *  Return               : void
   *  Critical/explanation : No
   **************************************************************/
-
-  void EnableCan(S_CAN_Type *CAN){
-    CAN->rul_MCR = RESERVE_32MB_MASK;       /* Negate FlexCAN 1 halt state for 32 MBs */
-    while ((CAN->rul_MCR && CAN_MCR_FRZACK_MASK) >> CAN_MCR_FRZACK_SHIFT)  {}
-                   /* Good practice: wait for FRZACK to clear (not in freeze mode) */
-    while ((CAN->rul_MCR && CAN_MCR_NOTRDY_MASK) >> CAN_MCR_NOTRDY_SHIFT)  {}
-
-    rps_PORTE->raul_PCR[4] |= 0x00000500;
-    rps_PORTE->raul_PCR[5] |= 0x00000500;
+  void FLEXCAN_receive_msg(S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG *RxDATA){
+ RxDATA[FIRST_PART_OF_MSG] = CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA1];
+ RxDATA[SECOND_PART_OF_MSG] = CAN->raul_RAMn[can_mb*MSG_BUF_SIZE+MSG_BUF_DATA2];
+ CAN->rul_IFLAG1 = FLAG_READY_MASK << can_mb;
   }
+
+  /**************************************************************
+   *  Name                 : FLEXCAN0_msg_flag
+   *  Description          : Read msg flag to determinate waiting messages
+   *  Parameters           : [S_CAN_Type *CAN, const T_UBYTE can_mb]
+   *  Return               : void
+   *  Critical/explanation : No
+   **************************************************************/
+   T_UBYTE FLEXCAN_msg_flag(S_CAN_Type *CAN, const T_UBYTE can_mb){
+	   return ((CAN->rul_IFLAG1>> can_mb) & ACTIVE);
+   }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */
