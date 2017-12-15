@@ -62,13 +62,6 @@
 /*============================================================================*/
 E_SensorStateMachine re_SensorSmState = SENSOR_IDLE;
 
-S_SeatBeltSensor rs_DriverSeatBeltSensor = {0, BS_FAULTY, BS_FAULTY, BS_FAULTY};
-S_SeatBeltSensor rs_PassengerSeatBeltSensor =  {0, BS_FAULTY, BS_FAULTY, BS_FAULTY};
-S_OcuppancySeatSensor rs_PassengerSeatSensor =  {0,OS_FAULTY, OS_FAULTY, OS_FAULTY};
-
-S_SeatBeltSensor *rps_DriverSeatBeltSensor = &rs_DriverSeatBeltSensor;
-S_SeatBeltSensor *rps_PassengerSeatBeltSensor = &rs_PassengerSeatBeltSensor;
-S_OcuppancySeatSensor *rps_PassengerSeatSensor = &rs_PassengerSeatSensor;
 
 /* Private functions prototypes */
 /*============================================================================*/
@@ -245,7 +238,7 @@ void sensorsm_UpdateSBStatus(S_SeatBeltSensor *lps_SBSensor){
     lps_SBSensor-> re_SensorCurrentStatus = BS_FAULTY;
   }
   else if (lul_SensorVoltage > 1200) { 	/* If voltage > 12V */
-    lps_SBSensor-> re_SensorCurrentStatus = BS_BUCKLE;
+    lps_SBSensor-> re_SensorCurrentStatus = BS_BUCKLED;
   }
   else if (lul_SensorVoltage >1000) { 	/* If voltage > 10v */
 	lps_SBSensor-> re_SensorCurrentStatus = BS_UNDETERMINED;
@@ -303,7 +296,7 @@ void sensorsm_StateMachine(void){
       //leds_TurnOffUpLED();
       //leds_TurnOffDownLED();
       //leds_TurnOffAntipinchLED();
-      //sensorsm_IdleState();
+      sensorsm_IdleState();
       break;
 
     case DRIVER_SEAT_BELT_VALIDATION:

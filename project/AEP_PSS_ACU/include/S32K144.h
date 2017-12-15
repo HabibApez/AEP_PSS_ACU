@@ -10259,7 +10259,7 @@ typedef struct {
  */
 
 
-/** S32_SysTick - Size of Registers Arrays */
+/** S32_ - Size of Registers Arrays */
 
 /** S32_SysTick - Register Layout Typedef */
 typedef struct {

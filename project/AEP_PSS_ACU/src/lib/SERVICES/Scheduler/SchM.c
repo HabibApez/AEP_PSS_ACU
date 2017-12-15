@@ -42,7 +42,7 @@
 /* Includes */
 /*============================================================================*/
 #include "SERVICES\Scheduler\SchM.h"
-#include "SERVICES\interrupts\interrupts.h"
+#include "SERVICES\Interrupts\interrupts.h"
 // include interrupts
 
 /* Constants and types  */
@@ -138,7 +138,7 @@ void SchM_Init(const SchM_ConfigType *SchM_Config){
     SchM_TaskControlBlock[LocTaskIdx].SchM_TaskState = SCHM_TASK_STATE_SUSPENDED;
     }
 
-  SysTick_Init(SchM_OsTick);            /* Initialize PIT0 for 781.25 micro-seconds timeout & Callback Install */
+  SysTick_Init(SchM_OsTick);
   SchM_Control.SchM_State = SCHM_INIT;
 }
 

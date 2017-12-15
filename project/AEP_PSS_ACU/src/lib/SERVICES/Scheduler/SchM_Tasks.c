@@ -42,16 +42,21 @@
 /* Includes */
 /*============================================================================*/
 #include "SERVICES\Scheduler\SchM_Tasks.h"
-#include "APP\sensorsm.h"					   // OK
 #include "HAL\leds.h"
 #include "HAL\can.h"
-
+#include "APP\sensorsm.h"
+#include "APP\passengerremsm.h"
 
 /* Constants and types  */
 /*============================================================================*/
+#define ONE_SECOND_TASK 		500
+#define ZERO_SECOND_TASK		0
+#define POWER_UP_CONTER_RESET	0
+
 
 /* Variables */
 /*============================================================================*/
+extern T_UBYTE rub_PowerUpCounter;
 
 /* Private functions prototypes */
 /*============================================================================*/
@@ -85,7 +90,7 @@ void SchM_5ms_Task(void){   /* Code Task0*/
 	      rul_TxMessageData[1] = rul_RxMessageData[1];
 		  //can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
 	      leds_TurnOffDownLED();
-
+	      rub_PowerUpCounter = POWER_UP_CONTER_RESET;
 	}
 	leds_TurnOffAntipinchLED();
 }
@@ -111,7 +116,17 @@ void SchM_10ms_Task(void){  /* Code Task1*/
  **************************************************************/
 void SchM_20ms_Task(void){  /* Code Task2*/
   //leds_ToggleGreenBoardLED();
-  // Send Chrime and Seat Belt data each 200ms
+  // Run Driver an Passenger Reminders state machines
+  static T_UBYTE lub_OneSecondCounter = ZERO_SECOND_TASK;
+  lub_OneSecondCounter++;
+  if(lub_OneSecondCounter >= ONE_SECOND_TASK){
+	  lub_OneSecondCounter = ZERO_SECOND_TASK;
+	  rub_PowerUpCounter++;
+	  passengerremsm_ModingStateMachine();
+  }
+  else{
+	  // Do nothing
+  }
 }
 
 /**************************************************************
@@ -123,7 +138,7 @@ void SchM_20ms_Task(void){  /* Code Task2*/
  **************************************************************/
 void SchM_40ms_Task(void){  /* Code Task3*/
   //leds_ToggleAntipinchLED();
-  // Run Driver an Passenger Reminders state machines
+  // Send Chrime and Seat Belt data each 200ms
 }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */
