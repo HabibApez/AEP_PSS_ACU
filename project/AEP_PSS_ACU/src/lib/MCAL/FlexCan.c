@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: flexcan.c $
- * $Revision: version 1 $
- * $Author: Habib Apez $
- * $Date: 2017-12-11 $
+ * $Source: FlexCan.c $
+ * $Revision: version  $
+ * $Author: Antonio vazquez $
+ * $Date: 2017-12-08 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \flexcan.c
-    flexcan module file for SK32144 uC. Located at MCAL.
+/** \FlexCan.c
+    Flex Can module file for SK32144 uC. Located at MCAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -37,12 +37,13 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: flexcan.c  $
+ * $Log: FlexCan.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "MCAL\flexcan.h"
+#include "MCAL\FlexCan.h"
+#include "MCAL\port.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -50,6 +51,7 @@
 
 /* Variables */
 /*============================================================================*/
+
 
 /* Private functions prototypes */
 /*============================================================================*/
@@ -165,11 +167,10 @@ void flexcan_ValidateConfiguration(S_CAN *lps_CAN){
 
 /* Exported functions */
 /*============================================================================*/
-
 /**************************************************************
- *  Name                 : flexcan_InitCAN
- *  Description          : Initializes the FlexCANx module
- *  Parameters           : [T_UBYTE PCC_CANx_INDEX]
+ *  Name                 : EnableCAN
+ *  Description          : Configures the CAN
+ *  Parameters           : [S_CAN_Type *CAN]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
@@ -178,9 +179,9 @@ void flexcan_InitFlexCAN0(){
 }
 
 /**************************************************************
- *  Name                 : flexcan_ClearMessageBufferFlag
- *  Description          : Clears Message Buffer Flag
- *  Parameters           : [S_FlexCAN *lps_CAN, T_UBYTE lub_MessageBuffer]
+ *  Name                 : CHECK_MB_ID
+ *  Description          : Check the ID bits
+ *  Parameters           : [S_CAN_Type *CAN, T_UBYTE ID]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
@@ -189,9 +190,9 @@ void flexcan_ClearMessageBufferFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer){
 }
 
 /**************************************************************
- *  Name                 : flexcan_TransmitMessageFlexCAN(
- *  Description          : Transmit a CAN message
- *  Parameters           : [S_FlexCAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_ULONG lul_MessageId, T_ULONG *lpl_TxData]
+ *  Name                 : ACCEPTANCE_MB_ID
+ *  Description          : Configures the MB to be accepted
+ *  Parameters           : [S_CAN_Type *CAN, T_UBYTE ID]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
@@ -211,9 +212,9 @@ void flexcan_TransmitMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T
 }
 
 /**************************************************************
- *  Name                 : flexcan_ReceiveMessageFlexCAN
- *  Description          : Receive a CAN message
- *  Parameters           : [S_FlexCAN *lps_CAN, T_ULONG *lpl_TxData]
+ *  Name                 : Configure_Receiver
+ *  Description          : Configures a MB to receives messages
+ *  Parameters           : [S_CAN_Type *CAN, T_UBYTE MB, T_UBYTE ID_Type, T_UBYTE ID]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
