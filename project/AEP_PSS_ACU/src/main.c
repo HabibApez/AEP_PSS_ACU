@@ -50,8 +50,9 @@
 #include "SERVICES\Interrupts\interrupts.h"    // OK
 #include "SERVICES\Scheduler\SchM.h"           // OK
 #include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
-#include "SERVICES\CAN\CAN_Services.h"
-#include "MCAL\io.h"
+
+#include "HAL\can.h"                       // OK
+
 
 /* Constants and types  */
 /*============================================================================*/
@@ -78,35 +79,50 @@ void SysTick_Handler(void);
 void SysTick_Handler(void){
   if (NULL!= GlbSysTickCallback)
 	  GlbSysTickCallback();
-   leds_ToggleBlueBoardLED();
+  // leds_ToggleBlueBoardLED();
 }
 
 /**************************************************************
  *  Name                 : main
  *  Description          : Implements the main function
  *  Parameters           : [void]
- *  Return               : voidx
+ *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
  int main(void){
-
   clock_InitClock();
   leds_InitBoardLeds();
   leds_InitLeds();
   sensor_InitSensors();
 
 
-FLEXCAN_init(rps_CAN0);
+  can_InitCAN0();
 
- for(;;){
-	 ACU_StateMachine();
-	     }
+  /*
+  for(;;){
+	leds_TurnOffDownLED();
+	leds_TurnOffAntipinchLED();
+	if(1 == can_CheckMessageArrivalCAN0(RX_MSG1_BUFF)){
+	  leds_TurnOnDownLED();
+	  leds_TurnOffAntipinchLED();
+      can_ReceiveMessageCAN0(RX_MSG1_BUFF, rul_RxMessageData);
+      rul_TxMessageData[0] = rul_RxMessageData[0];
+      rul_TxMessageData[1] = rul_RxMessageData[1];
+	  can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
+	}
+	if(1 == can_CheckMessageArrivalCAN0(RX_MSG2_BUFF)){
+	  leds_TurnOffDownLED();
+      leds_TurnOnAntipinchLED();
+      can_ReceiveMessageCAN0(RX_MSG2_BUFF, rul_RxMessageData);
+      rul_TxMessageData[0] = rul_RxMessageData[0];
+      rul_TxMessageData[1] = rul_RxMessageData[1];
+      can_TransmitMessageCAN0(TX_MSG2_BUFF, TX_MSG2_ID, rul_TxMessageData);
+	}
+  }
 
-
-
-
- SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
- SchM_Start();		        /* Start Scheduler Services */
+*/
+  SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
+  SchM_Start();		        /* Start Scheduler Services */
 
   for(;;){
     // Do nothing

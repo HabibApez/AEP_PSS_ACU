@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: ACU_StateMachine.c $
+ * $Source: can.h $
  * $Revision: version 1 $
- * $Author: Antonio Vazquez $
- * $Date: 2017-12-09 $
+ * $Author: Habib Apez $
+ * $Date: 2017-12-11  $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \ACU_StateMachine.c
-    State Machine function for the ACU. Located at APP.
+/** \can.h
+    Header file for can module. Located at HAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -29,68 +29,59 @@
 /*============================================================================*/
 /*                    REUSE HISTORY - taken over from                         */
 /*============================================================================*/
+/*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Antonio Vazquez    |          1         |   Initial version               */
+/* Habib Apez          |          1         |   Initial version               */
+/* Antonio Vazquez          |          2         |   Macros' revision              */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: ACU_StateMachine.c  $
+ * $Log: can.h  $
   ============================================================================*/
+#ifndef __CAN_H
+#define __CAN_H
 
 /* Includes */
 /*============================================================================*/
-#include "SERVICES\CAN\CAN_Services.h"
+#include "MCAL\flexcan.h"
+#include "MCAL\io.h"
+#include "MCAL\pcc.h"
+#include "MCAL\port.h"
 
-/* Constants and types  */
+/* Constants and types */
+/*============================================================================*/
+#define PTE4 	4 	/* CAN_RX */
+#define PTE5 	5 	/* CAN_TX */
+
+#define ID_0x100     	0x04000000u
+#define ID_0x511  		0x14440000u		/*Id of the Message1 */
+#define ID_0x320   		0x0C800000u		/*Id of the Message1 */
+#define RX_MSG1_BUFF 	4u 		/*Message Buffer of the Message1 */
+#define RX_MSG2_BUFF 	0u 		/*Message Buffer of the Message1 */
+
+#define ID_0x601  		0x18040000u		/*Id of the Message1 */
+#define ID_0x602  		0x18080000u		/*Id of the Message1 */
+#define TX_MSG1_BUFF 	1 		/*Message Buffer of the Message1 */
+#define TX_MSG2_BUFF 	2 		/*Message Buffer of the Message1 */
+
+#define MUX_CAN_MASK  0x00000500u
+#define OSCILLATOR_CLOCK_SOURCE 0x2000u
+#define CLOCK_500KHz  0x00DB0006
+#define GLOBAL_ID_ACCEPTANCE  0x1FFFFFFFu
+#define RECEPTION_STD_ID      0x04000000u
+
+
+/* Exported Variables */
 /*============================================================================*/
 
-/* Variables */
+/* Exported functions prototypes */
 /*============================================================================*/
-T_UBYTE rub_ACUMode = 0;
-
-/* Private functions prototypes */
-/*============================================================================*/
-
-/* Inline functions */
-/*============================================================================*/
-
-/* Private functions */
-/*============================================================================*/
-
-/* Exported functions */
-/*============================================================================*/
-/**************************************************************
- *  Name                 : ACU_StateMachine
- *  Description          : Manager the main function for the ACU module.
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void ACU_StateMachine (void){
-  T_ULONG rx_msg_data[2];
-
-if(FLEXCAN_msg_flag(rps_CAN0, MSG_BUF_4)){
-  FLEXCAN_receive_msg(rps_CAN0, MSG_BUF_4, rx_msg_data);
-if (rx_msg_data[FIRST_PART_OF_MSG] == ENG_INACTIVE){
-	rub_ACUMode = ACU_OFF_MODE;
-	leds_ToggleBlueBoardLED();
-	FLEXCAN_transmit_msg (rps_CAN0, MSG_BUF_0, STANDARD_ID, ID_0x320, 4, rx_msg_data);
+void can_InitCAN0(void);
+void can_TransmitMessageCAN0(T_UBYTE lub_MessageBuffer, T_ULONG lul_MessageId, T_ULONG *lpl_TxData);
+void can_ReceiveMessageCAN0(T_UBYTE lub_MessageBuffer, T_ULONG *lpl_RxData);
+T_UBYTE can_CheckMessageArrivalCAN0(T_UBYTE lub_MessageBuffer);
 
 
-}
-
-if (rx_msg_data[SECOND_PART_OF_MSG] == 0x11111111){
-	leds_ToggleRedBoardLED();
-}
-
-if (rx_msg_data[FIRST_PART_OF_MSG]==ENG_ACTIVE){
-	rub_ACUMode = ACU_ON_MODE;
-	leds_ToggleRedBoardLED();
-}
-}}
-
-
-
- /* Notice: the file ends with a blank new line to avoid compiler warnings */
+#endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

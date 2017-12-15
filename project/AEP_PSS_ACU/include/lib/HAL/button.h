@@ -52,7 +52,7 @@
 
 /* Constants and types */
 /*============================================================================*/
-#define PTE5 5		/* Port PTE5, bit 5: UP_BUTTON intput (UP Button) */
+#define PTA11 11		/* Port PTA11, bit 11: UP_BUTTON intput (UP Button) */
 #define PTA12 12	/* Port PTA12, bit 12: DOWN_BUTTON intput (DOWN Button) */
 #define PTA13 13	/* Port PTA13, bit 13: ANTIPINCH_BUTTON intput (ANTIPINCH Button) */
 

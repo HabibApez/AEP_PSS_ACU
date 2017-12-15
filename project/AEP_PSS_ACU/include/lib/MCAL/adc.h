@@ -32,6 +32,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          2         |   Init function generalizated   */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -102,7 +103,7 @@ S_ADC *rps_ADC1 = ADC1_Address;
 
 /* Exported functions prototypes */
 /*============================================================================*/
-void adc_InitADC();
+void adc_InitADC(S_ADC *lps_ADC, T_UBYTE PCC_ADCx_INDEX);
 T_ULONG adc_ReadADCChannel(S_ADC *lps_ADC, T_UBYTE lub_ADCH);
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

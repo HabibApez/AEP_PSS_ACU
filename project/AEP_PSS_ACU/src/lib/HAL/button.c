@@ -5,7 +5,7 @@
 /*============================================================================*/
 /*!
  * $Source: button.c $
- * $Revision: version 4 $
+ * $Revision: version 5 $
  * $Author: Habib Apez $
  * $Date: 2017-11-08 $
  */
@@ -37,6 +37,7 @@
 /*                     |                    |   and MISRA checked             */
 /* Habib Apez          |          3         |   Debounce adjusted at 10ms     */
 /* Habib Apez          |          4         |   Function descriptions added   */
+/* Habib Apez          |          5         |   Antipinch LED changed to PTA11*/
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -69,7 +70,7 @@
 /*============================================================================*/
 /**************************************************************
  *  Name                 : button_InitButtons
- *  Description          : Configures 3 inputs for Up[PTE5], Down[PTA12] and 
+ *  Description          : Configures 3 inputs for Up[PTA11], Down[PTA12] and
  *                         Antipinch[PTA13] buttons, each one with an input filter  
  *  Parameters           : [void]
  *  Return               : void
@@ -77,13 +78,12 @@
  **************************************************************/
 void button_InitButtons(void){
   pcc_EnablePeripheralClock(PCC_PORTA_INDEX);
-  pcc_EnablePeripheralClock(PCC_PORTE_INDEX);
 
   io_InputPin(rps_PTA, 1<<PTA13);          /* Antipinch Button*/
   port_ConfigurePinMode(rps_PORTA, PTA13, 0x00000110);  /* MUX = GPIO, input filter enabled */
 
-  io_InputPin(rps_PTE, 1<<PTE5);          /* Up Button*/
-  port_ConfigurePinMode(rps_PORTE, PTE5, 0x00000110);  /* MUX = GPIO, input filter enabled */
+  io_InputPin(rps_PTA, 1<<PTA11);          /* Up Button*/
+  port_ConfigurePinMode(rps_PORTE, PTA11, 0x00000110);  /* MUX = GPIO, input filter enabled */
 
   io_InputPin(rps_PTA, 1<<PTA12);          /* Down Button*/
   port_ConfigurePinMode(rps_PORTA, PTA12, 0x00000110);  /* MUX = GPIO, input filter enabled */
@@ -97,7 +97,7 @@ void button_InitButtons(void){
  *  Critical/explanation : No
  **************************************************************/
 T_UBYTE button_CheckButtonUp(void){
-  return io_GetPinData(rps_PTE, PTE5);
+  return io_GetPinData(rps_PTA, PTA11);
 }
 
 /**************************************************************

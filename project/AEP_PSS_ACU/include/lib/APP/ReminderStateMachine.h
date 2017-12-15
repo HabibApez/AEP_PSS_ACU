@@ -1,18 +1,19 @@
+
 /*============================================================================*/
 /*                        I BS SOFTWARE GROUP                                 */
 /*============================================================================*/
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: Communication.h $
+ * $Source: FlexCan.h $
  * $Revision: version 1 $
  * $Author: Antonio Vazquez $
  * $Date: 2017-12-08 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \Communication
-    Header file for CAN BUS Communication. Located at HAL.
+/** \FlexCan.h
+    Header file for FlexCan.c located at MCAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -37,35 +38,26 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: Communication.h  $
+ * $Log: FlexCan.h  $
   ============================================================================*/
-#ifndef __COMMUNICATION_H
-#define __COMMUNICATION_H
+#ifndef LIB_APP_REMINDERSTATEMACHINE_H_
+#define LIB_APP_REMINDERSTATEMACHINE_H_
+
 
 /* Includes */
 /*============================================================================*/
-#include "MCAL\FlexCan.h"
+#include "SERVICES\Communication\CAN_Services.h"
 
 /* Constants and types */
 /*============================================================================*/
-#define FLAG_READY_MASK     0x00000001u
-#define FIRST_PART_OF_MSG   0u
-#define SECOND_PART_OF_MSG  1u
-#define ENABLE_TRANSMITION  0x0C000000u
-#define TRANSMISION_FRAME   0x00400000u
-#define CAN_WMBn_CS_DLC_SHIFT  16u
 
-
-#define ACTIVE				1
-#define INACTIVE			2
 
 /* Exported Variables */
 /*============================================================================*/
 
 /* Exported functions prototypes */
 /*============================================================================*/
-void FLEXCAN_init(S_CAN_Type *CAN);
-void FLEXCAN_transmit_msg (S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA);
-void FLEXCAN_receive_msg(S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG *RxDATA);
+
+
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

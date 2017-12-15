@@ -32,6 +32,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          2         |   Init function generalizated   */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -51,12 +52,6 @@
 
 /* Private functions prototypes */
 /*============================================================================*/
-
-/* Inline functions */
-/*============================================================================*/
-
-/* Private functions */
-/*============================================================================*/
 void adc_DisableConversionModule(S_ADC *lps_ADC);
 void adc_DisableInterrupts(S_ADC *lps_ADC);
 void adc_EnableInterrupts(S_ADC *lps_ADC);
@@ -69,45 +64,21 @@ T_UWORD adc_ReadConversionResult(S_ADC *lps_ADC, T_UBYTE lub_ADCH);
 T_ULONG adc_ReadADCChannel(S_ADC *lps_ADC, T_UBYTE lub_ADCH);
 void adc_StartConversion(S_ADC *lps_ADC, T_UBYTE lub_ADCH);
 
-/* Exported functions */
+/* Inline functions */
+/*============================================================================*/
+
+/* Private functions */
 /*============================================================================*/
 
 /**************************************************************
- *  Name                 : adc_InitADC
- *  Description          : Selects one of the input channels
- *  Parameters           : [S_ADC *lps_ADC]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void adc_InitADC(){
-  rps_PCC->raul_PCCn[PCC_ADC0_INDEX] &=~ 0x40000000; 	/* Disable clock to change PCS */
-  rps_PCC->raul_PCCn[PCC_ADC0_INDEX] |= 1<<24; 			/* PCS=1: Select SOSCDIV2_CLK */
-  rps_PCC->raul_PCCn[PCC_ADC0_INDEX] |= 0x40000000; 	/* Enable bus clock in ADC */;
-
-  adc_DisableConversionModule(rps_ADC0);
-  adc_DisableInterrupts(rps_ADC0);
-  adc_ConfigClock(rps_ADC0, 0x000000004);		  /* ADICLK=0: Input clk=ALTCLK1=SOSCDIV2 */
-  	  	  	  	  	  	  	  	  	  	  	  	  /* ADIV=0: Prescaler=1 */
-  	  	  	  	  	  	  	  	  	  	  	  	  /* MODE=1: 12-bit conversion */
-  adc_ConfigSampleTime(rps_ADC0, 0x00000000C); 	  /* SMPLTS=12(default): sample time is 13 ADC clks */
-  adc_ConfigSC2Register(rps_ADC0, 0x00000000);	  /* ADTRG=0: SW trigger */
-  	  	  	  	  	  	  	  	  	  	  	  	  /* ACFE,ACFGT,ACREN=0: Compare func disabled */
-  	  	  	  	  	  	  	  	  	  	  	  	  /* DMAEN=0: DMA disabled */
-  	  	  	  	  	  	  	  	  	  	  	  	  /* REFSEL=0: Voltage reference pins= VREFH, VREEFL */
-  adc_ConfigSC3Register(rps_ADC0, 0x00000000); 	  /* CAL=0: Do not start calibration sequence */
-  	  	  	  	  	  	  	  	  	  	  	  	  /* ADCO=0: One conversion performed */
-  	  	  	  	  	  	  	  	  	  	  	  	  /* AVGE,AVGS=0: HW average function disabled */
-}
-
-/**************************************************************
  *  Name                 : adc_DisableConversionModule
- *  Description          : Selects one of the input channels
+ *  Description          : Disables the specified conversion module
  *  Parameters           : [S_ADC *lps_ADC]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
 void adc_DisableConversionModule(S_ADC *lps_ADC){
-  lps_ADC->rul_SC1[0] = 0x00003F;				/* ADCH=1F: Module is disabled for conversions*/
+  lps_ADC->rul_SC1[0] |= 0x00003F;				/* ADCH=1F: Module is disabled for conversions*/
 }
 
 /**************************************************************
@@ -225,6 +196,37 @@ T_ULONG adc_ReadADCChannel(S_ADC *lps_ADC, T_UBYTE lub_ADCH){
 void adc_StartConversion(S_ADC *lps_ADC, T_UBYTE lub_ADCH){
 	lps_ADC->rul_SC1[0] &= ~(0x1F);
 	lps_ADC->rul_SC1[0] |= lub_ADCH & 0x1F;
+}
+
+
+/* Exported functions */
+/*============================================================================*/
+
+/**************************************************************
+ *  Name                 : adc_InitADC
+ *  Description          : Initializes the ADCx module
+ *  Parameters           : [S_ADC *lps_ADC, T_UBYTE PCC_ADCx_INDEX]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void adc_InitADC(S_ADC *lps_ADC, T_UBYTE PCC_ADCx_INDEX){
+  rps_PCC->raul_PCCn[PCC_ADCx_INDEX] &=~ 0x40000000; 	/* Disable clock to change PCS */
+  rps_PCC->raul_PCCn[PCC_ADCx_INDEX] |= 1<<24; 			/* PCS=1: Select SOSCDIV2_CLK */
+  rps_PCC->raul_PCCn[PCC_ADCx_INDEX] |= 0x40000000; 	/* Enable bus clock in ADC */;
+
+  adc_DisableConversionModule(lps_ADC);
+  adc_DisableInterrupts(lps_ADC);
+  adc_ConfigClock(lps_ADC, 0x000000004);		  /* ADICLK=0: Input clk=ALTCLK1=SOSCDIV2 */
+  	  	  	  	  	  	  	  	  	  	  	  	  /* ADIV=0: Prescaler=1 */
+  	  	  	  	  	  	  	  	  	  	  	  	  /* MODE=1: 12-bit conversion */
+  adc_ConfigSampleTime(lps_ADC, 0x00000000C); 	  /* SMPLTS=12(default): sample time is 13 ADC clks */
+  adc_ConfigSC2Register(lps_ADC, 0x00000000);	  /* ADTRG=0: SW trigger */
+  	  	  	  	  	  	  	  	  	  	  	  	  /* ACFE,ACFGT,ACREN=0: Compare func disabled */
+  	  	  	  	  	  	  	  	  	  	  	  	  /* DMAEN=0: DMA disabled */
+  	  	  	  	  	  	  	  	  	  	  	  	  /* REFSEL=0: Voltage reference pins= VREFH, VREEFL */
+  adc_ConfigSC3Register(lps_ADC, 0x00000000); 	  /* CAL=0: Do not start calibration sequence */
+  	  	  	  	  	  	  	  	  	  	  	  	  /* ADCO=0: One conversion performed */
+  	  	  	  	  	  	  	  	  	  	  	  	  /* AVGE,AVGS=0: HW average function disabled */
 }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */
