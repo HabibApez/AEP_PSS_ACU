@@ -73,5 +73,9 @@ T_UBYTE button_DebounceButtonDown(void);
 T_UBYTE button_DebounceButtonAntipinch(void);
 
 void button_InitBoardButtons(void);
+T_UBYTE button_CheckRightBoardButton(void);
+T_UBYTE button_CheckLefttBoardButton(void);
+T_UBYTE button_ValidRightBoardButtonPress(void);
+T_UBYTE button_ValidLeftBoardButtonPress(void);
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

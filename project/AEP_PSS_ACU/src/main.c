@@ -7,7 +7,7 @@
  * $Source: main.c $
  * $Revision: version 2$
  * $Author: Habib Apez $
- * $Date: 2017-12 -12 $
+ * $Date: 2017-12 -15 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -35,6 +35,7 @@
 /* Habib Apez          |          1         |   Initial version               */
 /* Habib Apez          |          2         |   Sensor Manager added to the   */
 /*                     |                    |   scheduler                     */
+/* Habib Apez          |          3         |   Passenger state machine added   */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/

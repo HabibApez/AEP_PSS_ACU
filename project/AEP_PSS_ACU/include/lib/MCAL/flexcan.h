@@ -32,7 +32,8 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
-/* Antonio Vazquez     |          2        |   Macros' revision               */
+/* Antonio Vazquez     |          2         |   Macros' revision               */
+/* Habib Apez          |          3         |   Macros correction             */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -66,8 +67,8 @@
 #define INCOMING_MSG_IDS_CHECK                    0xFFFFFFFFu
 #define MSG_BUFF_CFG                              0u
 #define MSG_BUFF_ID                               1u
-#define MSG_BUFF_DATA1                            2u
-#define MSG_BUFF_DATA2                            3u
+#define MSG_BUFF_DATA0                            2u
+#define MSG_BUFF_DATA1                            3u
 #define RESERVE_32MB                              0x0000001F
 #define CAN_NOTREADY_MASK                         0x8000000u
 #define CAN_NOTREADY_SHIFT                        27u
@@ -76,7 +77,7 @@
 #define FIRST_PART_OF_MSG                         0u
 #define SECOND_PART_OF_MSG	                      1u
 #define TRANSMISION_ENABLE_MASK                   0x0C400000u
-#define MSG_DLC_SIZE                              0u
+#define MSG_DLC_SIZE                              8u
 #define DLC_SHIFT                                 16u
 #define TRUE                                      1u
 #define FALSE                                     0u

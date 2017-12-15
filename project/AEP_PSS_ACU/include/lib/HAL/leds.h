@@ -80,6 +80,12 @@ void leds_ToggleDownLED(void);
 void leds_ToggleAntipinchLED(void);
 
 void leds_InitBoardLeds(void);
+void leds_TurnOnRedBoardLED(void);
+void leds_TurnOffRedBoardLED(void);
+void leds_TurnOnBlueBoardLED(void);
+void leds_TurnOffBlueBoardLED(void);
+void leds_TurnOnGreenBoardLED(void);
+void leds_TurnOffGreenBoardLED(void);
 void leds_ToggleBlueBoardLED(void);
 void leds_ToggleRedBoardLED(void);
 void leds_ToggleGreenBoardLED(void);

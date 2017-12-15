@@ -7,7 +7,7 @@
  * $Source: button.c $
  * $Revision: version 5 $
  * $Author: Habib Apez $
- * $Date: 2017-11-08 $
+ * $Date: 2017-12-15 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -37,7 +37,7 @@
 /*                     |                    |   and MISRA checked             */
 /* Habib Apez          |          3         |   Debounce adjusted at 10ms     */
 /* Habib Apez          |          4         |   Function descriptions added   */
-/* Habib Apez          |          5         |   Antipinch LED changed to PTA11*/
+/* Habib Apez          |          5         |   In-Board button functions added*/
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -207,6 +207,79 @@ void button_InitBoardButtons(void){
   port_ConfigurePinMode(rps_PORTC, PTC13, 0x00060110);  /* MUX = GPIO, input filter enabled */
 }
 
+/**************************************************************
+ *  Name                 : button_CheckLeftBoardButton
+ *  Description          : Checks if Left button is pressed
+ *  Parameters           : [void]
+ *  Return               : T_UBYTE
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE button_CheckLeftBoardButton(void){
+  return io_GetPinData(rps_PTC, PTC13);
+}
 
+/**************************************************************
+ *  Name                 : button_CheckRightBoardButton
+ *  Description          : Checks if Left button is pressed
+ *  Parameters           : [void]
+ *  Return               : T_UBYTE
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE button_CheckRightBoardButton(void){
+  return io_GetPinData(rps_PTC, PTC12);
+}
+
+/**************************************************************
+ *  Name                 : button_ValidRightBoardButtonPress
+ *  Description          : Verifies if the Right button press is  valid
+ *  Parameters           : [void]
+ *  Return               : T_UBYTE
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE button_ValidRightBoardButtonPress(void){
+   if(button_CheckRightBoardButton()){
+    delays_Wait10ms();
+    delays_Wait10ms();
+    delays_Wait10ms();
+    delays_Wait10ms();
+    delays_Wait10ms();
+    delays_Wait10ms();
+    delays_Wait10ms();
+    delays_Wait10ms();
+    delays_Wait10ms();
+    delays_Wait10ms();
+    if(button_CheckRightBoardButton()){
+      return 1;
+    }
+    else{
+      return 0;
+    }
+  }
+   else{
+    return 0;
+   }
+}
+
+/**************************************************************
+ *  Name                 : button_ValidLeftBoardButtonPress
+ *  Description          : Verifies if the Left button press is  valid
+ *  Parameters           : [void]
+ *  Return               : T_UBYTE
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE button_ValidLeftBoardButtonPress(void){
+   if(button_CheckLeftBoardButton()){
+    delays_Wait10ms();
+    if(button_CheckLeftBoardButton()){
+      return 1;
+    }
+    else{
+      return 0;
+    }
+  }
+   else{
+    return 0;
+   }
+}
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

@@ -247,4 +247,70 @@ void leds_ToggleGreenBoardLED(void){
   io_TogglePin(rps_PTD, 1<<PTD16); 
 }
 
+/**************************************************************
+ *  Name                 : leds_TurnOnGreenBoardLED
+ *  Description          : Turns on Red LED
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void leds_TurnOnGreenBoardLED(void){
+  io_ClearOutput(rps_PTD, 1<<PTD16);
+}
+
+/**************************************************************
+ *  Name                 : leds_TurnOnRedBoardLED
+ *  Description          : Turns on Red LED
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void leds_TurnOnRedBoardLED(void){
+  io_ClearOutput(rps_PTD, 1<<PTD15);
+}
+
+/**************************************************************
+ *  Name                 : leds_TurnOnBlueBoardLED
+ *  Description          : Turns on Red LED
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void leds_TurnOnBlueBoardLED(void){
+  io_ClearOutput(rps_PTD, 1<<PTD0);
+}
+
+/**************************************************************
+ *  Name                 : leds_TurnOffGreenBoardLED
+ *  Description          : Turns off Red LED
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void leds_TurnOffGreenBoardLED(void){
+  io_SetOutput(rps_PTD, 1<<PTD16);
+}
+
+/**************************************************************
+ *  Name                 : leds_TurnOffRedBoardLED
+ *  Description          : Turns on Red LED
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void leds_TurnOffRedBoardLED(void){
+  io_SetOutput(rps_PTD, 1<<PTD15);
+}
+
+/**************************************************************
+ *  Name                 : leds_TurnOffBlueBoardLED
+ *  Description          : Turns off Red LED
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void leds_TurnOffBlueBoardLED(void){
+  io_SetOutput(rps_PTD, 1<<PTD0);
+}
+
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

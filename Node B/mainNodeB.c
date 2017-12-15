@@ -4,15 +4,16 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: SchM_Tasks.c $
- * $Revision: version 1$
+ * $Source: main.c $
+ * $Revision: version 2$
  * $Author: Habib Apez $
- * $Date: 2017-11- 22 $
+ * $Date: 2017-12 -15 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \SchM_Tasks.c
-    Source of SchM_Tasks. Located at SERVICES in Scheduler.
+/** \main.c
+    Main at APP in Scheduler.
+    Window Lifter project main with Scheduler and State Machines.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -32,126 +33,127 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          2         |   Node B 						  */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: SchM_Tasks.c  $
+ * $Log: main.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "SERVICES\Scheduler\SchM_Tasks.h"
-#include "HAL\leds.h"
-#include "HAL\can.h"
-#include "APP\sensorsm.h"
-#include "APP\passengerremsm.h"
+#include "HAL\clock.h"                         // OK
+#include "HAL\button.h"                          // OK
+#include "HAL\leds.h"                          // OK
+#include "HAL\sensors.h"                       // OK
+#include "HAL\can.h"                       	   // OK
+#include "SERVICES\Interrupts\interrupts.h"    // OK
+#include "SERVICES\Scheduler\SchM.h"           // OK
+#include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
+
+
+
+#include "HAL\delays.h"                          // OK
+#include "MCAL\adc.h"                       	   // OK
 
 /* Constants and types  */
 /*============================================================================*/
-#define ONE_SECOND_TASK 		25
-#define ZERO_SECOND_TASK		0
-#define POWER_UP_CONTER_RESET	0
-
 
 /* Variables */
 /*============================================================================*/
-T_UBYTE rub_PowerUpCounter;
-T_UBYTE rub_EngineStatus;
-T_UWORD ruw_EngineRPM;
+T_UWORD ruw_EngineRPM = 0x2328;
+T_UBYTE rub_EngineStatus = 0x00;
 T_ULONG rul_RxMessageData[2] = {0, 0};
 T_ULONG rul_TxMessageData[2] = {0, 0};
 
 /* Private functions prototypes */
 /*============================================================================*/
+//void SysTick_Handler(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
+/**************************************************************
+ *  Name                 : adc_ReadRPM
+ *  Description          : Moves the Window upwards
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+T_UWORD main_ReadRPM(S_ADC *lps_ADC, T_UBYTE lub_ADCH){
+  T_UWORD luw_ADCResult = 0;
+
+  adc_StartConversion(lps_ADC, lub_ADCH);
+  while(0 == adc_CheckCompConvFlag(lps_ADC)){};
+  luw_ADCResult = adc_ReadConversionResult(lps_ADC, lub_ADCH);
+
+  //return (T_ULONG) ((5000*luw_ADCResult)/0xFFF); /* Convert result to mv for 0-5V range */
+  return luw_ADCResult; /* Convert result to mv for 0-5V range */
+}
+
+/**************************************************************
+ *  Name                 : main
+ *  Description          : Implements the main function
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+ int main(void){
+
+  clock_InitClock();
+  leds_InitBoardLeds();
+  leds_InitLeds();
+  button_InitBoardButtons();
+  sensor_InitSensors();
+  delays_InitTimer();
+
+  can_InitCAN0();
+
+  //SchM_Init(&SchM_Config);	/* Scheduler Services Initialization */
+  //SchM_Start();		        /* Start Scheduler Services */
+
+  for(;;){
+    ruw_EngineRPM = main_ReadRPM(rps_ADC0, 12);
+    if(1 == button_ValidRightBoardButtonPress()){
+    	if( 0x00 == rub_EngineStatus){
+    		rub_EngineStatus = 0x01;
+    		leds_TurnOnRedBoardLED();
+    	}
+    	else{
+    		if( 0x01 == rub_EngineStatus){
+    		leds_TurnOffRedBoardLED();
+    		rub_EngineStatus = 0x00;
+    		}
+    	}
+  }
+   // rub_EngineStatus = button_CheckButtonUp();
+    rul_TxMessageData[0] = 0x00000000;
+    rul_TxMessageData[0] |= (ruw_EngineRPM & 0x00FF) << 24;
+    rul_TxMessageData[0] |= ((ruw_EngineRPM & 0xFF00) >> 8) << 16;
+    rul_TxMessageData[0] |= rub_EngineStatus << 8;
+    rul_TxMessageData[1] = 0x00000000;
+    can_TransmitMessageCAN0(TX_MSG1_BUFF, 0x100, rul_TxMessageData);
+
+  //  if(1 == can_CheckMessageArrivalCAN0(RX_MSG1_BUFF)){
+			  //leds_TurnOnDownLED();
+//		      can_ReceiveMessageCAN0(RX_MSG1_BUFF, rul_RxMessageData);
+	//	      rul_TxMessageData[0] = rul_RxMessageData[0];
+		///      rul_TxMessageData[1] = rul_RxMessageData[1];
+			//  can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
+		      //leds_TurnOffDownLED();
+		    //  rub_PowerUpCounter = POWER_UP_CONTER_RESET;
+//		}
+    // Do nothing
+  }
+
+  return 0;
+}
 
 /* Exported functions */
 /*============================================================================*/
-/**************************************************************
- *  Name                 : SchM_5ms_Task
- *  Description          : Executes a task each 5ms
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SchM_5ms_Task(void){   /* Code Task0*/
-  //leds_ToggleBlueBoardLED();
-  // Read CAN bus and collect data from ECU each 10ms*
-
-	//leds_TurnOnAntipinchLED();
-	if(1 == can_CheckMessageArrivalCAN0(RX_MSG1_BUFF)){
-		  //leds_TurnOnDownLED();
-	      can_ReceiveMessageCAN0(RX_MSG1_BUFF, rul_RxMessageData);
-	      ruw_EngineRPM = ((rul_RxMessageData[0] & 0x00FF0000) >> 16) | ((rul_RxMessageData[0] & 0xFF000000) >> 16);
-	      rub_EngineStatus = (rul_RxMessageData[0] & 0x0000FF00) >> 8;
-
-		  //can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
-	      //leds_TurnOffDownLED();
-	      if(0 == rub_EngineStatus)
-	      rub_PowerUpCounter = POWER_UP_CONTER_RESET;
-	}
-	//leds_TurnOffAntipinchLED();
-}
-
-/**************************************************************
- *  Name                 : SchM_10ms_Task
- *  Description          : Executes a task each 10ms
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SchM_10ms_Task(void){  /* Code Task1*/
-  //leds_ToggleRedBoardLED();
-  sensorsm_StateMachine();
-}
-
-/**************************************************************
- *  Name                 : SchM_20ms_Task
- *  Description          : Executes a task each 20ms
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SchM_20ms_Task(void){  /* Code Task2*/
-  //leds_ToggleGreenBoardLED();
-  // Send Chrime and Seat Belt data each 200ms
-
-}
-
-/**************************************************************
- *  Name                 : SchM_40ms_Task
- *  Description          : Executes a task each 8ms
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SchM_40ms_Task(void){  /* Code Task3*/
-  leds_TurnOnAntipinchLED();
-  // Run Driver an Passenger Reminders state machines
-  static T_UBYTE lub_OneSecondCounter = ZERO_SECOND_TASK;
-  lub_OneSecondCounter++;
-  if(lub_OneSecondCounter >= ONE_SECOND_TASK){
-	  leds_TurnOnUpLED();
-	  lub_OneSecondCounter = ZERO_SECOND_TASK;
-
-	  rub_PowerUpCounter++;
-	  if(rub_PowerUpCounter >= 5){
-		  leds_ToggleDownLED();
-	  }
-
-	  passengerremsm_ModingStateMachine();
-	  leds_TurnOffUpLED();
-  }
-  else{
-	  // Do nothing
-  }
-  leds_TurnOffAntipinchLED();
-}
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */
+

@@ -54,7 +54,7 @@
 #define PTE4 	4 	/* CAN_RX */
 #define PTE5 	5 	/* CAN_TX */
 
-#define RX_MSG1_ID		0x511		/*Id of the Message1 */
+#define RX_MSG1_ID		0x100		/*Id of the Message1 */
 #define RX_MSG2_ID		0x320		/*Id of the Message1 */
 #define RX_MSG1_BUFF 	4 		/*Message Buffer of the Message1 */
 #define RX_MSG2_BUFF 	0 		/*Message Buffer of the Message1 */

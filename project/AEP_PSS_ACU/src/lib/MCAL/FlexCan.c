@@ -32,7 +32,8 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
-/* Antonio Vazquez     |          2        |   Macros' revision              */
+/* Antonio Vazquez     |          2         |   Macros' revision              */
+/* Habib Apez          |          3         |   Macros correction             */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -196,11 +197,9 @@ void flexcan_ClearMessageBufferFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer){
  *  Critical/explanation : No
  **************************************************************/
 void flexcan_TransmitMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_ULONG lul_MessageId, T_ULONG *lpul_TxData){
-  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA1] = lpul_TxData[FIRST_PART_OF_MSG]; /* MB word 2: data word 0 */
-  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA2] = lpul_TxData[SECOND_PART_OF_MSG]; /* MB word 3: data word 1 */
-
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA1] = lpul_TxData[SECOND_PART_OF_MSG]; /* MB word 3: data word 1 */
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA0] = lpul_TxData[FIRST_PART_OF_MSG]; /* MB word 2: data word 0 */
   lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_ID] = lul_MessageId;
-
   lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_CFG] = TRANSMISION_ENABLE_MASK | (MSG_DLC_SIZE << DLC_SHIFT); /* MB0 word 0: */
 		                                                /* EDL,BRS,ESI=0: CANFD not used */
 		                                                /* CODE=0xC: Activate msg buf to transmit */
@@ -221,7 +220,7 @@ void flexcan_ReceiveMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_
   T_UBYTE i = 0;
 
   for (i=0; i<2; i++) {  /* Read two words of data (8 bytes) */
-	  lpul_RxData[i] = lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA1+ i];
+	  lpul_RxData[i] = lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + 2 + i];
     }
   i = lps_CAN->rul_TIMER; /* Read TIMER to unlock message buffers */
 }
