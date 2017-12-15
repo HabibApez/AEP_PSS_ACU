@@ -77,11 +77,11 @@ void ACU_StateMachine (void){
   	  switch(rx_msg_data[FIRST_PART_OF_MSG]){
   	  case ENG_INACTIVE:
   		  rub_ACUMode = ACU_OFF_MODE;
-  		  leds_ToggleBlueBoardLED();
+  		  leds_ToggleRedBoardLED();
   		  break;
   	  case ENG_ACTIVE:
   		  rub_ACUMode = ACU_ON_MODE;
-  		  leds_ToggleRedBoardLED();
+  		  leds_ToggleBlueBoardLED();
   		  break;
   	  default:
   		  break;
