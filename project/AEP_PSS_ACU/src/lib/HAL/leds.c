@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: led.c $
- * $Revision: version 4 $
+ * $Revision: version 5 $
  * $Author: Habib Apez $
- * $Date: 2017-11-08 $
+ * $Date: 2017-12-15 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -36,6 +36,8 @@
 /*                     |                    |   and MISRA checked             */
 /* Habib Apez          |          3         |   Function descriptions added   */
 /* Habib Apez          |          4         |   Board LED functions added     */
+/* Habib Apez          |          5         |   Up LED pin changed because    */
+/*                     |                    |   it caused conflict with CAN   */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -66,7 +68,7 @@
 /*============================================================================*/
 /**************************************************************
  *  Name                 : leds_InitLeds
- *  Description          : Configures 3 outputs for Up[PTE4], Down[PTD1] and 
+ *  Description          : Configures 3 outputs for Up[PTA11], Down[PTD1] and
  *                         Antipinch[PTC17] leds  
  *  Parameters           : [void]
  *  Return               : void
@@ -75,10 +77,10 @@
 void leds_InitLeds(void){
   pcc_EnablePeripheralClock(PCC_PORTC_INDEX);
   pcc_EnablePeripheralClock(PCC_PORTD_INDEX);
-  pcc_EnablePeripheralClock(PCC_PORTE_INDEX);
+  pcc_EnablePeripheralClock(PCC_PORTA_INDEX);
 
-  io_OutputPin(rps_PTE, 1<<PTE4);          /* Up LED*/
-  port_ConfigurePinMode(rps_PORTE, PTE4, 0x00000100);  /* MUX = GPIO */
+  io_OutputPin(rps_PTA, 1<<PTA11);          /* Up LED*/
+  port_ConfigurePinMode(rps_PORTA, PTA11, 0x00000100);  /* MUX = GPIO */
 
   io_OutputPin(rps_PTD, 1<<PTD1);          /* Down LED*/
   port_ConfigurePinMode(rps_PORTD, PTD1, 0x00000100);  /* MUX = GPIO */
@@ -95,7 +97,7 @@ void leds_InitLeds(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_TurnOnUpLED(void){
-  io_SetOutput(rps_PTE, 1<<PTE4);
+  io_SetOutput(rps_PTA, 1<<PTA11);
 }
 
 /**************************************************************
@@ -128,7 +130,7 @@ void leds_TurnOnAntipinchLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_TurnOffUpLED(void){
-  io_ClearOutput(rps_PTE, 1<<PTE4);
+  io_ClearOutput(rps_PTA, 1<<PTA11);
 }
 
 /**************************************************************
@@ -185,7 +187,7 @@ void leds_InitBoardLeds(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_ToggleUpLED(void){
-  io_TogglePin(rps_PTE, 1<<PTE4);
+  io_TogglePin(rps_PTA, 1<<PTA11);
 }
 
 /**************************************************************

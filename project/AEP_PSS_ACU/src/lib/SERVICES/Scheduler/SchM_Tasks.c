@@ -49,14 +49,14 @@
 
 /* Constants and types  */
 /*============================================================================*/
-#define ONE_SECOND_TASK 		500
+#define ONE_SECOND_TASK 		25
 #define ZERO_SECOND_TASK		0
 #define POWER_UP_CONTER_RESET	0
 
 
 /* Variables */
 /*============================================================================*/
-extern T_UBYTE rub_PowerUpCounter;
+T_UBYTE rub_PowerUpCounter;
 
 /* Private functions prototypes */
 /*============================================================================*/
@@ -80,19 +80,19 @@ void SchM_5ms_Task(void){   /* Code Task0*/
   //leds_ToggleBlueBoardLED();
   // Read CAN bus and collect data from ECU each 10ms*
 
-	leds_TurnOnAntipinchLED();
+	//leds_TurnOnAntipinchLED();
 	if(1 == can_CheckMessageArrivalCAN0(RX_MSG1_BUFF)){
-		  leds_TurnOnDownLED();
+		  //leds_TurnOnDownLED();
 		  T_ULONG rul_RxMessageData[2] = {0, 0};
 		  T_ULONG rul_TxMessageData[2] = {0, 0};
 	      can_ReceiveMessageCAN0(RX_MSG1_BUFF, rul_RxMessageData);
 	      rul_TxMessageData[0] = rul_RxMessageData[0];
 	      rul_TxMessageData[1] = rul_RxMessageData[1];
 		  //can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
-	      leds_TurnOffDownLED();
+	      //leds_TurnOffDownLED();
 	      rub_PowerUpCounter = POWER_UP_CONTER_RESET;
 	}
-	leds_TurnOffAntipinchLED();
+	//leds_TurnOffAntipinchLED();
 }
 
 /**************************************************************
@@ -116,17 +116,8 @@ void SchM_10ms_Task(void){  /* Code Task1*/
  **************************************************************/
 void SchM_20ms_Task(void){  /* Code Task2*/
   //leds_ToggleGreenBoardLED();
-  // Run Driver an Passenger Reminders state machines
-  static T_UBYTE lub_OneSecondCounter = ZERO_SECOND_TASK;
-  lub_OneSecondCounter++;
-  if(lub_OneSecondCounter >= ONE_SECOND_TASK){
-	  lub_OneSecondCounter = ZERO_SECOND_TASK;
-	  rub_PowerUpCounter++;
-	  passengerremsm_ModingStateMachine();
-  }
-  else{
-	  // Do nothing
-  }
+  // Send Chrime and Seat Belt data each 200ms
+
 }
 
 /**************************************************************
@@ -137,8 +128,21 @@ void SchM_20ms_Task(void){  /* Code Task2*/
  *  Critical/explanation : No
  **************************************************************/
 void SchM_40ms_Task(void){  /* Code Task3*/
-  //leds_ToggleAntipinchLED();
-  // Send Chrime and Seat Belt data each 200ms
+  leds_TurnOnAntipinchLED();
+  // Run Driver an Passenger Reminders state machines
+  static T_UBYTE lub_OneSecondCounter = ZERO_SECOND_TASK;
+  lub_OneSecondCounter++;
+  if(lub_OneSecondCounter >= ONE_SECOND_TASK){
+	  leds_TurnOnUpLED();
+	  lub_OneSecondCounter = ZERO_SECOND_TASK;
+	  rub_PowerUpCounter++;
+	  passengerremsm_ModingStateMachine();
+	  leds_TurnOffUpLED();
+  }
+  else{
+	  // Do nothing
+  }
+  leds_TurnOffAntipinchLED();
 }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

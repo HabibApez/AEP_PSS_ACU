@@ -7,7 +7,7 @@
  * $Source: leds.h $
  * $Revision: version 4 $
  * $Author: Habib Apez $
- * $Date: 2017-11-08 $
+ * $Date: 2017-12-15 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -36,6 +36,8 @@
 /*                     |                    |   and MISRA checked             */
 /* Habib Apez          |          3         |   Function descriptions added   */
 /* Habib Apez          |          4         |   Board LED functions added     */
+/* Habib Apez          |          5         |   Up LED pin changed because    */
+/*                     |                    |   it caused conflict with CAN   */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -53,7 +55,7 @@
 
 /* Constants and types */
 /*============================================================================*/
-#define PTE4 4		/* Port PTE4, bit 4: UP_LED output (blue LED) */
+#define PTA11 11	/* Port PTEA, bit 11: UP_LED output (blue LED) */
 #define PTC17 17	/* Port PTC17, bit 17: ANTIPINCH_LED output (red LED) */
 #define PTD1 1		/* Port PTD1, bit 1: DOWN_LED output (green LED) */    
 
