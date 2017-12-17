@@ -57,7 +57,7 @@
 
 /*NULL Mask*/
 #ifndef NULL
-#define NULL                                     0u
+#define NULL                                 	  0
 #endif
 
 /**Masks*/

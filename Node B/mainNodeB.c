@@ -118,12 +118,12 @@ T_UWORD main_ReadRPM(S_ADC *lps_ADC, T_UBYTE lub_ADCH){
   for(;;){
     ruw_EngineRPM = main_ReadRPM(rps_ADC0, 12);
     if(1 == button_ValidRightBoardButtonPress()){
-    	if( 0x00 == rub_EngineStatus){
+    	if(0x00 == rub_EngineStatus){
     		rub_EngineStatus = 0x01;
     		leds_TurnOnRedBoardLED();
     	}
     	else{
-    		if( 0x01 == rub_EngineStatus){
+    		if(0x01 == rub_EngineStatus){
     		leds_TurnOffRedBoardLED();
     		rub_EngineStatus = 0x00;
     		}
@@ -136,7 +136,7 @@ T_UWORD main_ReadRPM(S_ADC *lps_ADC, T_UBYTE lub_ADCH){
     rul_TxMessageData[0] |= rub_EngineStatus << 8;
     rul_TxMessageData[1] = 0x00000000;
     can_TransmitMessageCAN0(TX_MSG1_BUFF, 0x100, rul_TxMessageData);
-
+    leds_ToggleDownLED();
   //  if(1 == can_CheckMessageArrivalCAN0(RX_MSG1_BUFF)){
 			  //leds_TurnOnDownLED();
 //		      can_ReceiveMessageCAN0(RX_MSG1_BUFF, rul_RxMessageData);

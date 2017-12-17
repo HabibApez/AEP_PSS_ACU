@@ -247,7 +247,6 @@ T_UBYTE button_ValidRightBoardButtonPress(void){
     delays_Wait10ms();
     delays_Wait10ms();
     delays_Wait10ms();
-    delays_Wait10ms();
     if(button_CheckRightBoardButton()){
       return 1;
     }

@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: passengerremsm.c $
- * $Revision: version 1 $
+ * $Revision: version 2 $
  * $Author: Habib Apez $
- * $Date: 2017-12-14 $
+ * $Date: 2017-12-16 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -33,6 +33,8 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          2         |   Functions related to S_ChimeRequest */
+/*                     |                    |   and S_Indication redefined    */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -63,6 +65,9 @@ E_PassengerReminderStateMachine re_UnfastenedAndOccupiedSmState = NO_CHIME_AND_C
 E_PassengerReminderChimeStateMachine re_ChimeSmState = CHIME_TYPE1_PASSENGER;
 E_PassengerReminderTellTaleStateMachine re_TelltaleSmState = FLASHING_TELLTALE_PASSENGER;
 
+S_ChimeRequest rs_Chime;
+S_ChimeRequest *rps_Chime = &rs_Chime;
+
 S_Reminder rs_PassengerReminder;
 S_Reminder *rps_PassengerReminder = &rs_PassengerReminder;
 
@@ -72,13 +77,18 @@ T_UBYTE rub_PowerUpCounter = ZERO;
 /*============================================================================*/
 void passengerremsm_PassengerFastenedOrNotOccupiedState(void);
 void passengerremsm_PassengerUnfastenedAndOccupiedState(void);
-void passengerremsm_PassengerNoChimeAndcontinuousIndicationState(void);
+void passengerremsm_PassengerNoChimeAndContinuousIndicationState(void);
 void passengerremsm_PassengerBasicIndicationState(void);
 void passengerremsm_PassengerChimeType1State(void);
 void passengerremsm_PassengerNoChimeState(void);
 void passengerremsm_PassengerFlashingTelltaleState(void);
 void passengerremsm_PassengerContinuousTelltaleState(void);
 void passengerremsm_PassengerNoIndicationTelltaleState(void);
+void passengerremsm_ConfigNoIndication(void);
+void passengerremsm_ConfigContinuousIndication(void);
+void passengerremsm_ConfigFlashingIndication(void);
+void passengerremsm_ConfigNoChime(void);
+void passengerremsm_ConfigType1Chime(void);
 
 /* Inline functions */
 /*============================================================================*/
@@ -131,23 +141,87 @@ void passengerremsm_PassengerUnfastenedAndOccupiedState(void){
 }
 
 /**************************************************************
- *  Name                 : passengerremsm_PassengerNoChimeAndcontinuousIndicationState
- *  Description          : Defines the state
+ *  Name                 : passengerremsm_PassengerNoChimeAndContinuousIndicationState
+ *  Description          : Defines the Passenger No Chime And Continuous Indication state
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void passengerremsm_PassengerNoChimeAndcontinuousIndicationState(void){
-  (rps_PassengerReminder->rs_Chime).rub_SoundTone = NO_CHIME_SOUND_TONE;		/* No Chime */
-  (rps_PassengerReminder->rs_Chime).rub_Cadence = NO_CHIME_CADENCE;
-  (rps_PassengerReminder->rs_Chime).rub_DutyCycle = NO_CHIME_DUTY_CYCLE;
-
-  (rps_PassengerReminder->rs_Indication).rub_Indication = INDICATION_ON;		/* Continuous Indication */
-  (rps_PassengerReminder->rs_Indication).rub_DutyCycle = INDICATION_CONTINUOUS_DC;
-  (rps_PassengerReminder->rs_Indication).rub_Period = INDICATION_CONTINUOUS_T;
+void passengerremsm_PassengerNoChimeAndContinuousIndicationState(void){
+  passengerremsm_ConfigContinuousIndication();
+  passengerremsm_ConfigNoChime();
 
   if(rub_PowerUpCounter > TWENTY_FIVE_SECONDS)
     re_UnfastenedAndOccupiedSmState = BASIC_INDICATION_PASSENGER;
+}
+
+/**************************************************************
+ *  Name                 : passengerremsm_ConfigNoChime
+ *  Description          : Configures the chime to no chime
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void passengerremsm_ConfigNoChime(void){
+  rps_Chime->rub_SoundTone = NO_CHIME_SOUND_TONE;
+  rps_Chime->rub_Cadence = NO_CHIME_CADENCE;
+  rps_Chime->rub_Repetitions = NO_CHIME_REPETITIONS;
+  rps_Chime->rub_DutyCycle = NO_CHIME_DUTY_CYCLE;
+  rps_PassengerReminder->rub_ChimeStatus = CHIME_OFF;
+}
+
+/**************************************************************
+ *  Name                 : passengerremsm_ConfigType1Chime
+ *  Description          : Configures the chime to Type1
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void passengerremsm_ConfigType1Chime(void){
+  rps_Chime->rub_SoundTone = CHIME_SOUND_TONE;
+  rps_Chime->rub_Cadence = CHIME_CADENCE;
+  rps_Chime->rub_Repetitions = CHIME_REPETITIONS;
+  rps_Chime->rub_DutyCycle = CHIME_DUTY_CYCLE;
+  rps_PassengerReminder->rub_ChimeStatus = CHIME_ON;
+}
+
+/**************************************************************
+ *  Name                 : passengerremsm_ConfigNoIndication
+ *  Description          : Configures the no indication
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void passengerremsm_ConfigNoIndication(void){
+  rps_PassengerReminder->rs_Indication.rub_IndicationOn = INDICATION_ON_FALSE;
+  rps_PassengerReminder->rs_Indication.rub_DutyCycle = NO_INDICATION_DC;
+  rps_PassengerReminder->rs_Indication.rub_Period = NO_INDICATION_PERIOD;
+}
+
+/**************************************************************
+ *  Name                 : passengerremsm_ConfigContinuousIndication
+ *  Description          : Configures the continuous indication
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void passengerremsm_ConfigContinuousIndication(void){
+  rps_PassengerReminder->rs_Indication.rub_IndicationOn = INDICATION_ON_TRUE;
+  rps_PassengerReminder->rs_Indication.rub_DutyCycle = INDICATION_CONTINUOUS_DC;
+  rps_PassengerReminder->rs_Indication.rub_Period = INDICATION_CONTINUOUS_PERIOD;
+}
+
+/**************************************************************
+ *  Name                 : passengerremsm_ConfigFlashingIndication
+ *  Description          : Configures the Flashing indication
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void passengerremsm_ConfigFlashingIndication(void){
+  rps_PassengerReminder->rs_Indication.rub_IndicationOn = INDICATION_ON_TRUE;
+  rps_PassengerReminder->rs_Indication.rub_DutyCycle = INDICATION_FLASHING_DC;
+  rps_PassengerReminder->rs_Indication.rub_Period = INDICATION_FLASHING_PERIOD;
 }
 
 /**************************************************************
@@ -180,9 +254,7 @@ void passengerremsm_PassengerChimeType1State(void){
 	  re_ChimeSmState = NO_CHIME_PASSENGER;
   }
   else{
-    (rps_PassengerReminder->rs_Chime).rub_SoundTone = CHIME_SOUND_TONE;		/* Chime Type1 */
-    (rps_PassengerReminder->rs_Chime).rub_Cadence = CHIME_CADENCE;
-    (rps_PassengerReminder->rs_Chime).rub_DutyCycle = CHIME_DUTY_CYCLE;
+	  passengerremsm_ConfigType1Chime();
   }
 }
 
@@ -194,9 +266,7 @@ void passengerremsm_PassengerChimeType1State(void){
  *  Critical/explanation : No
  **************************************************************/
 void passengerremsm_PassengerNoChimeState(void){
-  (rps_PassengerReminder->rs_Chime).rub_SoundTone = NO_CHIME_SOUND_TONE;		/* Chime Type1 */
-  (rps_PassengerReminder->rs_Chime).rub_Cadence = NO_CHIME_CADENCE;
-  (rps_PassengerReminder->rs_Chime).rub_DutyCycle = NO_CHIME_DUTY_CYCLE;
+  passengerremsm_ConfigNoChime();
 }
 
 /**************************************************************
@@ -215,9 +285,7 @@ void passengerremsm_PassengerFlashingTelltaleState(void){
 	  re_TelltaleSmState = CONTINUOUS_TELLTALE_PASSENGER;
   }
   else{
-    (rps_PassengerReminder->rs_Indication).rub_Indication = INDICATION_ON;		/* Continuous Indication */
-    (rps_PassengerReminder->rs_Indication).rub_DutyCycle = INDICATION_FLASHING_DC;
-    (rps_PassengerReminder->rs_Indication).rub_Period = INDICATION_FLASHING_T;
+	  passengerremsm_ConfigFlashingIndication();
   }
 }
 
@@ -237,9 +305,7 @@ void passengerremsm_PassengerContinuousTelltaleState(void){
 	  re_TelltaleSmState = NO_INDICATION_TELLTALE_PASSENGER;
   }
   else{
-    (rps_PassengerReminder->rs_Indication).rub_Indication = INDICATION_ON;		/* Continuous Indication */
-    (rps_PassengerReminder->rs_Indication).rub_DutyCycle = INDICATION_CONTINUOUS_DC;
-    (rps_PassengerReminder->rs_Indication).rub_Period = INDICATION_CONTINUOUS_T;
+	  passengerremsm_ConfigContinuousIndication();
   }
 }
 
@@ -251,9 +317,7 @@ void passengerremsm_PassengerContinuousTelltaleState(void){
  *  Critical/explanation : No
  **************************************************************/
 void passengerremsm_PassengerNoIndicationTelltaleState(void){
-  (rps_PassengerReminder->rs_Indication).rub_Indication = INDICATION_OFF;		/* Continuous Indication */
-  (rps_PassengerReminder->rs_Indication).rub_DutyCycle = NO_INDICATION_DUTY_CYCLE;
-  (rps_PassengerReminder->rs_Indication).rub_Period = NO_INDICATION_PERIOD;
+  passengerremsm_ConfigNoIndication();
 }
 
 /* Exported functions */
@@ -293,7 +357,7 @@ void passengerremsm_ModingStateMachine(void){
 void passengerremsm_UnfastenedAndOccupiedStateMachine(void){
   switch(re_UnfastenedAndOccupiedSmState){
     case NO_CHIME_AND_CONTINUOUS_INDICATION_PASSENGER:
-      passengerremsm_PassengerNoChimeAndcontinuousIndicationState();
+      passengerremsm_PassengerNoChimeAndContinuousIndicationState();
       break;
 
     case BASIC_INDICATION_PASSENGER:
@@ -351,6 +415,39 @@ void passengerremsm_TelltaleMachine(void){
     default:
       break;
   }
+}
+
+/**************************************************************
+ *  Name                 : passengerremsm_GetChimeStatus
+ *  Description          : Gets the Chime Status
+ *  Parameters           : [T_UBYTE]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE passengerremsm_GetChimeStatus(void){
+  return rps_PassengerReminder->rub_ChimeStatus;
+}
+
+/**************************************************************
+ *  Name                 : passengerremsm_GetChimeDutyCycle
+ *  Description          : Gets the Chime DutyCycle
+ *  Parameters           : [T_UBYTE]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE passengerremsm_GetChimeDutyCycle(void){
+  return (rps_PassengerReminder->rs_Indication).rub_DutyCycle;
+}
+
+/**************************************************************
+ *  Name                 : passengerremsm_GetChimePeriod
+ *  Description          : Gets the Chime Period
+ *  Parameters           : [T_UBYTE]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE passengerremsm_GetChimePeriod(void){
+  return (rps_PassengerReminder->rs_Indication).rub_Period;
 }
 
 /* Notice: the file ends with a blank new line to avoid compiler warnings */

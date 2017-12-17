@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: passengerremsm.h $
- * $Revision: version 1 $
+ * $Revision: version 2 $
  * $Author: Habib Apez $
- * $Date: 2017-12-14  $
+ * $Date: 2017-12-16  $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -33,6 +33,8 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          2         |   Defines changed, S_ChimeRequest */
+/*                     |                    |   and S_Indication redefined */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -48,21 +50,26 @@
 
 /* Constants and types */
 /*============================================================================*/
-#define CHIME_SOUND_TONE 			0x01	/* Sound Tone Active */
-#define CHIME_CADENCE  				0x0C	/* 1200ms Cadence */
-#define CHIME_DUTY_CYCLE			0x64	/* 100% Duty Cycle */
-#define NO_CHIME_SOUND_TONE 		0x00	/* Sound Tone Inactive */
-#define NO_CHIME_CADENCE  			0x00	/* No cadence */
-#define NO_CHIME_DUTY_CYCLE 		0x00	/* 0% Duty Cycle */
+#define INDICATION_ON_TRUE  			0x01	/* Indication On "True" */
+#define INDICATION_CONTINUOUS_DC		0x64	/* 100% Duty Cycle */
+#define INDICATION_FLASHING_DC 			0x32	/* 50% Duty Cycle */
+#define INDICATION_CONTINUOUS_PERIOD	0xFF	/* Continuous, No Period*/
+#define INDICATION_FLASHING_PERIOD  	0x01	/* 1Hz */
+#define INDICATION_ON_FALSE	       		0x00	/* Indication on "False" */
+#define NO_INDICATION_DC				0x00	/* 0% Duty Cycle */
+#define NO_INDICATION_PERIOD  			0x00	/* 0Hz */
 
-#define INDICATION_ON      			0x01	/* Indication Active */
-#define INDICATION_CONTINUOUS_DC	0x64	/* 50% Duty Cycle */
-#define INDICATION_FLASHING_DC 		0x32	/* 50% Duty Cycle */
-#define INDICATION_CONTINUOUS_T		0xFF	/* Continuous */
-#define INDICATION_FLASHING_T  		0x01	/* 1Hz */
-#define INDICATION_OFF  	       	0x00	/* Indication Inactive */
-#define NO_INDICATION_DUTY_CYCLE 	0x00	/* 0% Duty Cycle */
-#define NO_INDICATION_PERIOD  		0x00	/* 0Hz */
+#define CHIME_ON 				0x01	/* Chime Active */
+#define CHIME_OFF  				0x00	/* Chime Inactive */
+
+#define CHIME_SOUND_TONE 			0x4B	/* 70Hz */
+#define CHIME_CADENCE  				0x78	/* 1200ms Cadence */
+#define CHIME_REPETITIONS  			0xFF	/* Multiple repetitions */
+#define CHIME_DUTY_CYCLE			0x64	/* 100% Duty Cycle */
+#define NO_CHIME_SOUND_TONE 		0x00	/* 0HZ */
+#define NO_CHIME_CADENCE  			0x00	/* No cadence */
+#define NO_CHIME_REPETITIONS  		0x00	/* No repetitions */
+#define NO_CHIME_DUTY_CYCLE 		0x00	/* 0% Duty Cycle */
 
 typedef enum{
   FASTENED_OR_NOT_OCCUPIED_PASSENGER,
@@ -86,7 +93,7 @@ typedef enum{
 }E_PassengerReminderTellTaleStateMachine;
 
 typedef struct{
-  T_UBYTE rub_Indication;
+  T_UBYTE rub_IndicationOn;
   T_UBYTE rub_DutyCycle;
   T_UBYTE rub_Period;
 } S_Indication;
@@ -94,12 +101,13 @@ typedef struct{
 typedef struct{
   T_UBYTE rub_SoundTone;
   T_UBYTE rub_Cadence;
+  T_UBYTE rub_Repetitions;
   T_UBYTE rub_DutyCycle;
-} S_Chime;
+} S_ChimeRequest;
 
 typedef struct{
   S_Indication rs_Indication;
-  S_Chime rs_Chime;
+  T_UBYTE rub_ChimeStatus;
 } S_Reminder;
 
 
@@ -113,5 +121,7 @@ void passengerremsm_UnfastenedAndOccupiedStateMachine(void);
 void passengerremsm_ChimeStateMachine(void);
 void passengerremsm_TelltaleMachine(void);
 
-
+T_UBYTE passengerremsm_GetChimeStatus(void);
+T_UBYTE passengerremsm_GetChimeDutyCycle(void);
+T_UBYTE passengerremsm_GetChimePeriod(void);
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

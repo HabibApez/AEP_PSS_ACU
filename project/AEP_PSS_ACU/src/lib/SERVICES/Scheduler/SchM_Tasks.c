@@ -50,7 +50,8 @@
 /* Constants and types  */
 /*============================================================================*/
 #define ONE_SECOND_TASK 		25
-#define ZERO_SECOND_TASK		0
+#define TWO_HUNDRED_MS_TASK   	10
+#define ZERO_SECONDS_TASK		0
 #define POWER_UP_CONTER_RESET	0
 
 
@@ -121,7 +122,47 @@ void SchM_10ms_Task(void){  /* Code Task1*/
 void SchM_20ms_Task(void){  /* Code Task2*/
   //leds_ToggleGreenBoardLED();
   // Send Chrime and Seat Belt data each 200ms
+  static T_UBYTE lub_TwoMsCounter = ZERO_SECONDS_TASK;
+  lub_TwoMsCounter++;
 
+  if(TWO_HUNDRED_MS_TASK == lub_TwoMsCounter){
+	  lub_TwoMsCounter = ZERO_SECONDS_TASK;
+	  // Package CAN signals
+	  //Message1
+	  rul_TxMessageData[0] = (0x01) << 24; 	/* Driver Indication */
+	  rul_TxMessageData[0] = (0x64) << 16; 	/* Driver Indication Duty Cycle */
+	  rul_TxMessageData[0] = (0x01) << 8; 	/* Driver Indication Period*/
+	  rul_TxMessageData[0] = passengerremsm_GetChimeStatus() << 0; 	/* Passenger Indication */
+
+	  rul_TxMessageData[1] = passengerremsm_GetChimeDutyCycle() << 24; 	/* Passenger Indication Duty Cycle*/
+	  rul_TxMessageData[1] = passengerremsm_GetChimePeriod() << 16; 	/* Passenger Indication Period */
+	  rul_TxMessageData[1] = (0x00) << 8; 	/* No data */
+	  rul_TxMessageData[1] = (0x00) << 0; 	/* No data */
+
+	  // Send CAN messages
+	  can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
+
+
+	  // Package CAN signals
+	  //Message1
+	  rul_TxMessageData[0] = (0x4B) << 24; 	/* Sound Tone */
+	  rul_TxMessageData[0] = (0x78) << 16; 	/* Sound Cadence Period */
+	  rul_TxMessageData[0] = (0xFF) << 8; 	/* Repetitions*/
+	  rul_TxMessageData[0] = (0x64) << 0; 	/* Sound Tone Duty Cycle */
+
+
+	  rul_TxMessageData[1] = (0x01) << 24; 	/*  location Driver */
+	  rul_TxMessageData[1] = passengerremsm_GetChimeStatus() << 16; 	/* Location Passenger */
+	  rul_TxMessageData[1] = (0x00) << 8; 	/* No data */
+	  rul_TxMessageData[1] = (0x00) << 0; 	/* No data */
+
+	  // Send CAN messages
+	  can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
+
+  }
+  else{
+	  // Do nothing
+  }
 }
 
 /**************************************************************
@@ -134,11 +175,11 @@ void SchM_20ms_Task(void){  /* Code Task2*/
 void SchM_40ms_Task(void){  /* Code Task3*/
   leds_TurnOnAntipinchLED();
   // Run Driver an Passenger Reminders state machines
-  static T_UBYTE lub_OneSecondCounter = ZERO_SECOND_TASK;
+  static T_UBYTE lub_OneSecondCounter = ZERO_SECONDS_TASK;
   lub_OneSecondCounter++;
   if(lub_OneSecondCounter >= ONE_SECOND_TASK){
 	  leds_TurnOnUpLED();
-	  lub_OneSecondCounter = ZERO_SECOND_TASK;
+	  lub_OneSecondCounter = ZERO_SECONDS_TASK;
 
 	  rub_PowerUpCounter++;
 	  if(rub_PowerUpCounter >= 5){

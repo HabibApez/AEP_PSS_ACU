@@ -118,7 +118,7 @@ void flexcan_ConfigControlReg(S_CAN *lps_CAN, T_ULONG lul_Config2){
 void flexcan_ClearMessageBuffer(S_CAN *lps_CAN){
 	T_UBYTE i=0;
 	for(i=0; i<CAN_RAMn_COUNT; i++ ) {   /* CAN: clear 32 msg bufs x 4 words/msg buf = 128 words*/
-	lps_CAN->rul_RAMn[i] = NULL;      /* Clear msg buf word */
+	lps_CAN->rul_RAMn[i] = 0;      /* Clear msg buf word */
   }
   for(i=0; i<CAN_RXIMR_COUNT; i++ ) {          /* In FRZ mode, init CAN0 16 msg buf filters */
 	lps_CAN->rul_RXIMR[i] = INCOMING_MSG_IDS_CHECK;  /* Check all ID bits for incoming messages */
