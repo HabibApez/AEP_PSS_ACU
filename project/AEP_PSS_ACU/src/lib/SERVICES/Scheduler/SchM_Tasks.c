@@ -86,9 +86,9 @@ void SchM_5ms_Task(void){   /* Code Task0*/
   // Read CAN bus and collect data from ECU each 10ms*
 
 	//leds_TurnOnAntipinchLED();
-	if(1 == can_CheckMessageArrivalCAN0(RX_MSG1_BUFF)){
+	if(1 == can_CheckMessageArrivalCAN0(ENG_RPM_MSG_BUFF)){
 		  //leds_TurnOnDownLED();
-	      can_ReceiveMessageCAN0(RX_MSG1_BUFF, rul_RxMessageData);
+	      can_ReceiveMessageCAN0(ENG_RPM_MSG_BUFF, rul_RxMessageData);
 	      ruw_EngineRPM = ((rul_RxMessageData[0] & 0x00FF0000) >> 16) | ((rul_RxMessageData[0] & 0xFF000000) >> 16);
 	      rub_EngineStatus = (rul_RxMessageData[0] & 0x0000FF00) >> 8;
 
@@ -129,35 +129,38 @@ void SchM_20ms_Task(void){  /* Code Task2*/
 	  lub_TwoMsCounter = ZERO_SECONDS_TASK;
 	  // Package CAN signals
 	  //Message1
-	  rul_TxMessageData[0] = (0x01) << 24; 	/* Driver Indication */
-	  rul_TxMessageData[0] = (0x64) << 16; 	/* Driver Indication Duty Cycle */
-	  rul_TxMessageData[0] = (0x01) << 8; 	/* Driver Indication Period*/
-	  rul_TxMessageData[0] = passengerremsm_GetChimeStatus() << 0; 	/* Passenger Indication */
+	  rul_TxMessageData[0] = 0;
+	  rul_TxMessageData[0] |= (0x01) << 24; 	/* Driver Indication */
+	  rul_TxMessageData[0] |= (0x64) << 16; 	/* Driver Indication Duty Cycle */
+	  rul_TxMessageData[0] |= (0x01) << 8; 	/* Driver Indication Period*/
+	  rul_TxMessageData[0] |= passengerremsm_PassengerGetIndicatorStatus() << 0; 	/* Passenger Indication */
 
-	  rul_TxMessageData[1] = passengerremsm_GetChimeDutyCycle() << 24; 	/* Passenger Indication Duty Cycle*/
-	  rul_TxMessageData[1] = passengerremsm_GetChimePeriod() << 16; 	/* Passenger Indication Period */
-	  rul_TxMessageData[1] = (0x00) << 8; 	/* No data */
-	  rul_TxMessageData[1] = (0x00) << 0; 	/* No data */
+	  rul_TxMessageData[1] = 0;
+	  rul_TxMessageData[1] |= passengerremsm_PassengerGetIndicationDutyCycle() << 24; 	/* Passenger Indication Duty Cycle*/
+	  rul_TxMessageData[1] |= passengerremsm_PassengerGetIndicationPeriod() << 16; 	/* Passenger Indication Period */
+	  rul_TxMessageData[1] |= (0x00) << 8; 	/* No data */
+	  rul_TxMessageData[1] |= (0x00) << 0; 	/* No data */
 
 	  // Send CAN messages
-	  can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
+	  can_TransmitMessageCAN0(SEAT_BELT_INDICATOR_MSG_BUFF, SEAT_BELT_INDICATOR_MSG_ID, rul_TxMessageData);
 
 
 	  // Package CAN signals
 	  //Message1
-	  rul_TxMessageData[0] = (0x4B) << 24; 	/* Sound Tone */
-	  rul_TxMessageData[0] = (0x78) << 16; 	/* Sound Cadence Period */
-	  rul_TxMessageData[0] = (0xFF) << 8; 	/* Repetitions*/
-	  rul_TxMessageData[0] = (0x64) << 0; 	/* Sound Tone Duty Cycle */
+	  rul_TxMessageData[0] = 0;
+	  rul_TxMessageData[0] |= passengerremsm_GetSoundTone() << 24; 	/* Sound Tone */
+	  rul_TxMessageData[0] |= passengerremsm_GetSoundCadence() << 16; 	/* Sound Cadence Period */
+	  rul_TxMessageData[0] |= passengerremsm_GetSoundRepetitions() << 8; 	/* Sound Cadence Period */
+	  rul_TxMessageData[0] |= passengerremsm_GetSoundDutyCycle() << 0; 	/* Sound Tone Duty Cycle */
 
-
-	  rul_TxMessageData[1] = (0x01) << 24; 	/*  location Driver */
-	  rul_TxMessageData[1] = passengerremsm_GetChimeStatus() << 16; 	/* Location Passenger */
-	  rul_TxMessageData[1] = (0x00) << 8; 	/* No data */
-	  rul_TxMessageData[1] = (0x00) << 0; 	/* No data */
+	  rul_TxMessageData[1] = 0;
+	  rul_TxMessageData[1] |= (0x01) << 24; 	/*  location Driver */
+	  rul_TxMessageData[1] |= passengerremsm_PassengerGetChimeStatus() << 16; 	/* Location Passenger */
+	  rul_TxMessageData[1] |= (0x00) << 8; 	/* No data */
+	  rul_TxMessageData[1] |= (0x00) << 0; 	/* No data */
 
 	  // Send CAN messages
-	  can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
+	  can_TransmitMessageCAN0(CHIME_REQUEST_MSG_BUFF, CHIME_REQUEST_MSG_ID, rul_TxMessageData);
 
   }
   else{

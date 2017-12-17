@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: can.h $
- * $Revision: version 1 $
+ * $Revision: version 2$
  * $Author: Habib Apez $
- * $Date: 2017-12-11  $
+ * $Date: 2017-12-15  $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -33,6 +33,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          2         |   Messages configuration set    */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -54,15 +55,14 @@
 #define PTE4 	4 	/* CAN_RX */
 #define PTE5 	5 	/* CAN_TX */
 
-#define RX_MSG1_ID		0x100		/*Id of the Message1 */
-#define RX_MSG2_ID		0x320		/*Id of the Message1 */
-#define RX_MSG1_BUFF 	4 		/*Message Buffer of the Message1 */
-#define RX_MSG2_BUFF 	0 		/*Message Buffer of the Message1 */
+#define ENG_RPM_MSG_ID		0x100	/*Id of the Eng_RPM Message */
+#define ENG_RPM_MSG_BUFF 	0 		/*Message Buffer of the Message Eng_RPM */
 
-#define TX_MSG1_ID		0x510		/*Id of the Message1 */
-#define TX_MSG2_ID		0x550		/*Id of the Message1 */
-#define TX_MSG1_BUFF 	1 		/*Message Buffer of the Message1 */
-#define TX_MSG2_BUFF 	2 		/*Message Buffer of the Message1 */
+#define SEAT_BELT_INDICATOR_MSG_ID		0x601	/*Id of the Seat Belt Indicator Message */
+#define SEAT_BELT_INDICATOR_MSG_BUFF 	1 		/*Message Buffer of the Seat Belt Indicator Message */
+
+#define CHIME_REQUEST_MSG_ID		0x550	/*Id of the Chime Request Message*/
+#define CHIME_REQUEST_MSG_BUFF 		2 		/*Message Buffer of the Chime Request Message */
 
 
 /* Exported Variables */

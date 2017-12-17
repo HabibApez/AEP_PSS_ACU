@@ -5,14 +5,14 @@
 /*============================================================================*/
 /*!
  * $Source: passengerremsm.h $
- * $Revision: version 2 $
+ * $Revision: version 3 $
  * $Author: Habib Apez $
- * $Date: 2017-12-16  $
+ * $Date: 2017-12-17  $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \sensorsm.h
-    Header file for state machine sensors module. Located at HAL.
+/** \passengerremsm.h
+    Header file for state machine of the passenger reminder. Located at HAL.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -34,7 +34,8 @@
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
 /* Habib Apez          |          2         |   Defines changed, S_ChimeRequest */
-/*                     |                    |   and S_Indication redefined */
+/*                     |                    |   and S_Indication redefined    */
+/* Habib Apez          |          3         |   Get functions added           */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -77,11 +78,13 @@ typedef enum{
 }E_PassengerBasicReminderStateMachine;
 
 typedef enum{
+  IDLE_UNFASTENED_AND_OCUPPIED_PASSENGER,
   NO_CHIME_AND_CONTINUOUS_INDICATION_PASSENGER,
   BASIC_INDICATION_PASSENGER,
 }E_PassengerReminderStateMachine;
 
 typedef enum{
+  IDLE_CHIME_PASSENGER,
   CHIME_TYPE1_PASSENGER,
   NO_CHIME_PASSENGER,
 }E_PassengerReminderChimeStateMachine;
@@ -121,7 +124,14 @@ void passengerremsm_UnfastenedAndOccupiedStateMachine(void);
 void passengerremsm_ChimeStateMachine(void);
 void passengerremsm_TelltaleMachine(void);
 
-T_UBYTE passengerremsm_GetChimeStatus(void);
-T_UBYTE passengerremsm_GetChimeDutyCycle(void);
-T_UBYTE passengerremsm_GetChimePeriod(void);
+T_UBYTE passengerremsm_PassengerGetIndicatorStatus(void);
+T_UBYTE passengerremsm_PassengerGetIndicationDutyCycle(void);
+T_UBYTE passengerremsm_PassengerGetIndicationPeriod(void);
+
+T_UBYTE passengerremsm_GetSoundTone(void);
+T_UBYTE passengerremsm_GetSoundCadence(void);
+T_UBYTE passengerremsm_GetSoundRepetitions(void);
+T_UBYTE passengerremsm_GetSoundDutyCycle(void);
+T_UBYTE passengerremsm_PassengerGetChimeStatus(void);
+
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

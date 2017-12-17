@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: main.c $
- * $Revision: version 2$
+ * $Revision: version 3 $
  * $Author: Habib Apez $
- * $Date: 2017-12 -15 $
+ * $Date: 2017-12 -17 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -36,6 +36,7 @@
 /* Habib Apez          |          2         |   Sensor Manager added to the   */
 /*                     |                    |   scheduler                     */
 /* Habib Apez          |          3         |   Passenger state machine added   */
+/* Habib Apez          |          4         |   Tx CAN msgs functions added    */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -79,7 +80,7 @@ void SysTick_Handler(void);
 void SysTick_Handler(void){
   if (NULL!= GlbSysTickCallback)
 	  GlbSysTickCallback();
-   leds_ToggleBlueBoardLED();
+   //leds_ToggleBlueBoardLED();
 }
 
 /**************************************************************

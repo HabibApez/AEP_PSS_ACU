@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: can.c $
- * $Revision: version 1 $
+ * $Revision: version 2 $
  * $Author: Habib Apez $
- * $Date: 2017-12-11 $
+ * $Date: 2017-12-16 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -33,6 +33,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          2         |   Messages configuration set    */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -89,18 +90,12 @@ void can_InitCAN0(){
   flexcan_ClearMessageBuffer(rps_CAN0);
   flexcan_ConfigGlobalAccepMask(rps_CAN0, 0x1FFFFFFF);	/* Global acceptance mask: check all ID bits */
 
-  flexcan_ConfigMessageBuffer(rps_CAN0, RX_MSG1_BUFF, (RX_MSG1_ID<<2)<<16, 0x04000000);   	/* Msg Buf 4, word 0: Enable for reception */
+  flexcan_ConfigMessageBuffer(rps_CAN0, ENG_RPM_MSG_BUFF, (ENG_RPM_MSG_ID<<2)<<16, 0x04000000);   	/* Msg Buf 4, word 0: Enable for reception */
 																			/* EDL,BRS,ESI=0: CANFD not used */
 																			/* CODE=4: MB set to RX inactive */
 																			/* IDE=0: Standard ID */
 																			/* SRR, RTR, TIME STAMP = 0: not applicable */
 																			/* Msg Buf 4, word 1: Standard ID = 0x511 */
-  flexcan_ConfigMessageBuffer(rps_CAN0, RX_MSG2_BUFF, (RX_MSG2_ID<<2)<<16, 0x04000000);   	/* Msg Buf 1, word 0: Enable for reception */
-																			/* EDL,BRS,ESI=0: CANFD not used */
-																			/* CODE=4: MB set to RX inactive */
-																			/* IDE=0: Standard ID */
-																			/* SRR, RTR, TIME STAMP = 0: not applicable */
-																			/* Msg Buf 1, word 1: Standard ID = 0x320 */
   flexcan_ValidateConfiguration(rps_CAN0);
   flexcan_ConfigCAN0Pins();
 }
