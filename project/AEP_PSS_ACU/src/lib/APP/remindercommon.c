@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: SchM_Tasks.c $
- * $Revision: version 2$
+ * $Source: remindercommon.c $
+ * $Revision: version 1 $
  * $Author: Habib Apez $
- * $Date: 2017-12- 17 $
+ * $Date: 2017-12-17 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \SchM_Tasks.c
-    Source of SchM_Tasks. Located at SERVICES in Scheduler.
+/** \remindercommon.c
+    state machine for the passenger reminder. Located at APP.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -29,124 +29,82 @@
 /*============================================================================*/
 /*                    REUSE HISTORY - taken over from                         */
 /*============================================================================*/
+/*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
-/* Habib Apez          |          2         |   Read and send CAN messages added */
-/* Habib Apez          |          3         |   Modified for its use with     */
-/*                     |                    |   Communications layer          */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: SchM_Tasks.c  $
+ * $Log: remindercommon.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "SERVICES\Scheduler\SchM_Tasks.h"
-#include "SERVICES\Communications\canbus.h"
-#include "APP\sensorsm.h"
-#include "APP\driverremsm.h"
-#include "APP\passengerremsm.h"
-#include "HAL\leds.h"
+#include "APP\remindercommon.h"
+#include "Common\Std_Types.h"
 
 /* Constants and types  */
 /*============================================================================*/
-#define ONE_SECOND_TASK 		25
 
 /* Variables */
 /*============================================================================*/
-T_UBYTE rub_EngineStatus;
-T_UWORD ruw_EngineRPM;
-T_ULONG rul_RxMessageData[2] = {0, 0};
-T_ULONG rul_TxMessageData[2] = {0, 0};
 
 /* Private functions prototypes */
 /*============================================================================*/
-void SchM_RunDriverAndPassengerReminderSM(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
-/**************************************************************
- *  Name                 : SchM_DriverAndPassengerReminderSM
- *  Description          : Run Driver an Passenger Reminders state machines
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SchM_RunDriverAndPassengerReminderSM(void){
-  leds_TurnOnAntipinchLED();
-  //
-  static T_UBYTE lub_OneSecondCounter = ZERO_SECONDS_TASK;
-  lub_OneSecondCounter++;
-  if(lub_OneSecondCounter >= ONE_SECOND_TASK){
-	  leds_TurnOnUpLED();
-	  lub_OneSecondCounter = ZERO_SECONDS_TASK;
-
-	  rub_PowerUpCounter++;
-	  if(rub_PowerUpCounter >= 2){
-		  leds_ToggleDownLED();
-		  driverremsm_ModingStateMachine();
-		  passengerremsm_ModingStateMachine();
-
-	  }
-
-	  leds_TurnOffUpLED();
-  }
-  else{
-	  // Do nothing
-  }
-  leds_TurnOffAntipinchLED();
-}
 
 /* Exported functions */
 /*============================================================================*/
+
 /**************************************************************
- *  Name                 : SchM_5ms_Task
- *  Description          : Executes a task each 5ms
+ *  Name                 : remindercommon_GetSoundTone
+ *  Description          : Gets the Sound Tone
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void SchM_5ms_Task(void){   /* Code Task0*/
-  canbus_ReadEngRPMMessage();
+T_UBYTE remindercommon_GetSoundTone(void){
+  return rps_Chime->rub_SoundTone;
 }
 
 /**************************************************************
- *  Name                 : SchM_10ms_Task
- *  Description          : Executes a task each 10ms
+ *  Name                 : remindercommon_GetSoundCadence
+ *  Description          : Gets the Sound Cadence
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void SchM_10ms_Task(void){  /* Code Task1*/
-  sensorsm_StateMachine();
+T_UBYTE remindercommon_GetSoundCadence(void){
+  return rps_Chime->rub_Cadence;
 }
 
 /**************************************************************
- *  Name                 : SchM_20ms_Task
- *  Description          : Executes a task each 20ms
+ *  Name                 : remindercommon_GetSoundRepetitions
+ *  Description          : Gets the Sound Repetitions
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void SchM_20ms_Task(void){  /* Code Task2*/
-  canbus_SendCANMessages();
+T_UBYTE remindercommon_GetSoundRepetitions(void){
+  return rps_Chime->rub_Repetitions;
 }
 
 /**************************************************************
- *  Name                 : SchM_40ms_Task
- *  Description          : Executes a task each 8ms
+ *  Name                 : remindercommon_GetSoundDutyCycle
+ *  Description          : Gets the Sound Duty Cycle
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void SchM_40ms_Task(void){  /* Code Task3*/
-  SchM_RunDriverAndPassengerReminderSM();
+T_UBYTE remindercommon_GetSoundDutyCycle(void){
+  return rps_Chime->rub_DutyCycle;
 }
 
- /* Notice: the file ends with a blank new line to avoid compiler warnings */
+/* Notice: the file ends with a blank new line to avoid compiler warnings */

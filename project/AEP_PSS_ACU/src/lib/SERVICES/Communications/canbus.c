@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: SchM_Tasks.c $
- * $Revision: version 2$
+ * $Source: canbus.c $
+ * $Revision: version 1 $
  * $Author: Habib Apez $
  * $Date: 2017-12- 17 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \SchM_Tasks.c
-    Source of SchM_Tasks. Located at SERVICES in Scheduler.
+/** \canbus.c
+    Source of canbus. Located at SERVICES in communications.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -32,28 +32,23 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
-/* Habib Apez          |          2         |   Read and send CAN messages added */
-/* Habib Apez          |          3         |   Modified for its use with     */
-/*                     |                    |   Communications layer          */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: SchM_Tasks.c  $
+ * $Log: canbus.c  $
   ============================================================================*/
 
 /* Includes */
 /*============================================================================*/
-#include "SERVICES\Scheduler\SchM_Tasks.h"
 #include "SERVICES\Communications\canbus.h"
-#include "APP\sensorsm.h"
+#include "HAL\leds.h"
+#include "HAL\can.h"
 #include "APP\driverremsm.h"
 #include "APP\passengerremsm.h"
-#include "HAL\leds.h"
 
 /* Constants and types  */
 /*============================================================================*/
-#define ONE_SECOND_TASK 		25
 
 /* Variables */
 /*============================================================================*/
@@ -64,7 +59,8 @@ T_ULONG rul_TxMessageData[2] = {0, 0};
 
 /* Private functions prototypes */
 /*============================================================================*/
-void SchM_RunDriverAndPassengerReminderSM(void);
+void canbus_SendSeatBeltMessage(void);
+void canbus_SendChimeMessage(void);
 
 /* Inline functions */
 /*============================================================================*/
@@ -72,81 +68,95 @@ void SchM_RunDriverAndPassengerReminderSM(void);
 /* Private functions */
 /*============================================================================*/
 /**************************************************************
- *  Name                 : SchM_DriverAndPassengerReminderSM
- *  Description          : Run Driver an Passenger Reminders state machines
+ *  Name                 : canbus_SendSeatBeltMessage
+ *  Description          : Send Seat Belt data each 200ms
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void SchM_RunDriverAndPassengerReminderSM(void){
-  leds_TurnOnAntipinchLED();
-  //
-  static T_UBYTE lub_OneSecondCounter = ZERO_SECONDS_TASK;
-  lub_OneSecondCounter++;
-  if(lub_OneSecondCounter >= ONE_SECOND_TASK){
-	  leds_TurnOnUpLED();
-	  lub_OneSecondCounter = ZERO_SECONDS_TASK;
+void canbus_SendSeatBeltMessage(void){
+  // Package CAN signals
+  //Message1
+  rul_TxMessageData[0] =  0;
+  rul_TxMessageData[0] |= driverremsm_DriverGetIndicatorStatus() << 24; 	/* Driver Indication */
+  rul_TxMessageData[0] |= driverremsm_DriverGetIndicationDutyCycle() << 16; 	/* Driver Indication Duty Cycle */
+  rul_TxMessageData[0] |= driverremsm_DriverGetIndicationPeriod() << 8; 	/* Driver Indication Period*/
+  rul_TxMessageData[0] |= passengerremsm_PassengerGetIndicatorStatus() << 0; 	/* Passenger Indication */
 
-	  rub_PowerUpCounter++;
-	  if(rub_PowerUpCounter >= 2){
-		  leds_ToggleDownLED();
-		  driverremsm_ModingStateMachine();
-		  passengerremsm_ModingStateMachine();
+  rul_TxMessageData[1] = 0;
+  rul_TxMessageData[1] |= passengerremsm_PassengerGetIndicationDutyCycle() << 24; 	/* Passenger Indication Duty Cycle*/
+  rul_TxMessageData[1] |= passengerremsm_PassengerGetIndicationPeriod() << 16; 	/* Passenger Indication Period */
+  rul_TxMessageData[1] |= (0x00) << 8; 	/* No data */
+  rul_TxMessageData[1] |= (0x00) << 0; 	/* No data */
 
-	  }
+  // Send CAN messages
+  can_TransmitMessageCAN0(SEAT_BELT_INDICATOR_MSG_BUFF, SEAT_BELT_INDICATOR_MSG_ID, rul_TxMessageData);
+}
 
-	  leds_TurnOffUpLED();
-  }
-  else{
-	  // Do nothing
-  }
-  leds_TurnOffAntipinchLED();
+/**************************************************************
+ *  Name                 : canbus_SendChimetMessage
+ *  Description          : Send Chime data each 200ms
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+ void canbus_SendChimeMessage(void){
+ // Package CAN signals
+ //Message1
+ rul_TxMessageData[0] = 0;
+ rul_TxMessageData[0] |= remindercommon_GetSoundTone() << 24; 	/* Sound Tone */
+ rul_TxMessageData[0] |= remindercommon_GetSoundCadence() << 16; 	/* Sound Cadence Period */
+ rul_TxMessageData[0] |= remindercommon_GetSoundRepetitions() << 8; 	/* Sound Cadence Period */
+ rul_TxMessageData[0] |= remindercommon_GetSoundDutyCycle() << 0; 	/* Sound Tone Duty Cycle */
+
+ rul_TxMessageData[1] = 0;
+ rul_TxMessageData[1] |= driverremsm_DriverGetChimeStatus() << 24; 	/*  location Driver */
+ rul_TxMessageData[1] |= passengerremsm_PassengerGetChimeStatus() << 16; 	/* Location Passenger */
+ rul_TxMessageData[1] |= (0x00) << 8; 	/* No data */
+ rul_TxMessageData[1] |= (0x00) << 0; 	/* No data */
+
+  // Send CAN messages
+  can_TransmitMessageCAN0(CHIME_REQUEST_MSG_BUFF, CHIME_REQUEST_MSG_ID, rul_TxMessageData);
 }
 
 /* Exported functions */
 /*============================================================================*/
 /**************************************************************
- *  Name                 : SchM_5ms_Task
- *  Description          : Executes a task each 5ms
+ *  Name                 : canbus_ReadEngRPM
+ *  Description          : Read CAN bus and collect data from ECU each 10ms*
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void SchM_5ms_Task(void){   /* Code Task0*/
-  canbus_ReadEngRPMMessage();
+void canbus_ReadEngRPMMessage(void){
+  if(1 == can_CheckMessageArrivalCAN0(ENG_RPM_MSG_BUFF)){
+    can_ReceiveMessageCAN0(ENG_RPM_MSG_BUFF, rul_RxMessageData);
+    ruw_EngineRPM = ((rul_RxMessageData[0] & 0x00FF0000) >> 16) | ((rul_RxMessageData[0] & 0xFF000000) >> 16);
+    rub_EngineStatus = (rul_RxMessageData[0] & 0x0000FF00) >> 8;
+    if(0 == rub_EngineStatus)
+      rub_PowerUpCounter = POWER_UP_CONTER_RESET;
+  }
 }
 
 /**************************************************************
- *  Name                 : SchM_10ms_Task
- *  Description          : Executes a task each 10ms
+ *  Name                 : canbus_SendCANMessages
+ *  Description          : Send Seat Belt and Chime messages each 200ms
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void SchM_10ms_Task(void){  /* Code Task1*/
-  sensorsm_StateMachine();
-}
+void canbus_SendCANMessages(void){
+ static T_UBYTE lub_TwoMsCounter = ZERO_SECONDS_TASK;
+ lub_TwoMsCounter++;
 
-/**************************************************************
- *  Name                 : SchM_20ms_Task
- *  Description          : Executes a task each 20ms
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SchM_20ms_Task(void){  /* Code Task2*/
-  canbus_SendCANMessages();
-}
-
-/**************************************************************
- *  Name                 : SchM_40ms_Task
- *  Description          : Executes a task each 8ms
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void SchM_40ms_Task(void){  /* Code Task3*/
-  SchM_RunDriverAndPassengerReminderSM();
+ if(TWO_HUNDRED_MS_TASK == lub_TwoMsCounter){
+	  lub_TwoMsCounter = ZERO_SECONDS_TASK;
+	  canbus_SendSeatBeltMessage();
+	  canbus_SendChimeMessage();
+ }
+ else{
+	  // Do nothing
+ }
 }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

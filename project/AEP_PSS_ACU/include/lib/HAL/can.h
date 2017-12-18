@@ -61,7 +61,7 @@
 #define SEAT_BELT_INDICATOR_MSG_ID		0x601	/*Id of the Seat Belt Indicator Message */
 #define SEAT_BELT_INDICATOR_MSG_BUFF 	1 		/*Message Buffer of the Seat Belt Indicator Message */
 
-#define CHIME_REQUEST_MSG_ID		0x550	/*Id of the Chime Request Message*/
+#define CHIME_REQUEST_MSG_ID		0x602	/*Id of the Chime Request Message*/
 #define CHIME_REQUEST_MSG_BUFF 		2 		/*Message Buffer of the Chime Request Message */
 
 

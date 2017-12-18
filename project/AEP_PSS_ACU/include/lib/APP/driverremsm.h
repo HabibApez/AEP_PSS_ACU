@@ -4,14 +4,14 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: passengerremsm.h $
+ * $Source: driverremsm.h $
  * $Revision: version 2 $
  * $Author: Habib Apez $
  * $Date: 2017-12-17  $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \passengerremsm.h
+/** \driverremsm.h
     Header file for state machine of the passenger reminder. Located at HAL.
 */
 /*============================================================================*/
@@ -32,17 +32,18 @@
 /*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          1         |   Initial version based on      */
+/* 					   | 					|  	passengerremsm.h              */
 /* Habib Apez          |          2         |   Modified for its use with     */
 /*                     |                    |   remindercommon.c              */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: passengerremsm.h  $
+ * $Log: driverremsm.h  $
   ============================================================================*/
-#ifndef __PASSENGRRMSM_H
-#define __PASSENGRRMSM_H
+#ifndef __DRIVERREMSM_H
+#define __DRIVERREMSM_H
 
 /* Includes */
 /*============================================================================*/
@@ -52,41 +53,38 @@
 /* Constants and types */
 /*============================================================================*/
 typedef enum{
-  FASTENED_OR_NOT_OCCUPIED_PASSENG,
-  UNFASTENED_AND_OCCUPIED_PASSENG,
-}E_PassengerBasicReminderStateMachine;
+  FASTENED_DRIVER,
+  UNFASTENED_DRIVER,
+}E_DriverBasicReminderStateMachine;
 
 typedef enum{
-  IDLE_UNFASTENED_AND_OCUPPIED_PASSENG,
-  NO_CHIME_AND_CONTINUOUS_INDICATION_PASSENG,
-  BASIC_INDICATION_PASSENG,
-}E_PassengerReminderStateMachine;
+  BASIC_INDICATION_DRIVER,
+}E_DriverReminderStateMachine;
 
 typedef enum{
-  IDLE_CHIME_PASSENG,
-  CHIME_TYPE1_PASSENG,
-  NO_CHIME_PASSENG,
-}E_PassengerReminderChimeStateMachine;
+  IDLE_CHIME_DRIVER,
+  CHIME_TYPE1_DRIVER,
+  NO_CHIME_DRIVER,
+}E_DriverReminderChimeStateMachine;
 
 typedef enum{
-  FLASHING_TELLTALE_PASSENG,
-  CONTINUOUS_TELLTALE_PASSENG,
-  NO_INDICATION_TELLTALE_PASSENG
-}E_PassengerReminderTellTaleStateMachine;
+  FLASHING_TELLTALE_DRIVER,
+  CONTINUOUS_TELLTALE_DRIVER,
+  NO_INDICATION_TELLTALE_DRIVER
+}E_DriverReminderTellTaleStateMachine;
 
 /* Exported Variables */
 /*============================================================================*/
 
 /* Exported functions prototypes */
 /*============================================================================*/
-void passengerremsm_ModingStateMachine(void);
-void passengerremsm_UnfastenedAndOccupiedStateMachine(void);
-void passengerremsm_ChimeStateMachine(void);
-void passengerremsm_TelltaleMachine(void);
+void driverremsm_ModingStateMachine(void);
+void driverremsm_UnfastenedStateMachine(void);
+void driverremsm_ChimeStateMachine(void);
+void driverremsm_TelltaleMachine(void);
 
-T_UBYTE passengerremsm_PassengerGetIndicatorStatus(void);
-T_UBYTE passengerremsm_PassengerGetIndicationDutyCycle(void);
-T_UBYTE passengerremsm_PassengerGetIndicationPeriod(void);
-T_UBYTE passengerremsm_PassengerGetChimeStatus(void);
-
+T_UBYTE driverremsm_DriverGetIndicatorStatus(void);
+T_UBYTE driverremsm_DriverGetIndicationDutyCycle(void);
+T_UBYTE driverremsm_DriverGetIndicationPeriod(void);
+T_UBYTE driverremsm_DriverGetChimeStatus(void);
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: passengerremsm.c $
- * $Revision: version 3 $
+ * $Revision: version 5 $
  * $Author: Habib Apez $
- * $Date: 2017-12-17 $
+ * $Date: 2017-12-18 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -36,6 +36,11 @@
 /* Habib Apez          |          2         |   Functions related to S_ChimeRequest */
 /*                     |                    |   and S_Indication redefined    */
 /* Habib Apez          |          3         |   State machines modified       */
+/* Habib Apez          |          4         |   State machine reset when going*/
+/*					   |					|   back to the Fastened or not   */
+/*					   |					|   occupied state 			      */
+/* Habib Apez          |          5         |   Modified for its use with     */
+/*                     |                    |   remindercommon.c              */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -50,29 +55,18 @@
 
 /* Constants and types  */
 /*============================================================================*/
-#define ZERO		 			0
-#define ZERO_SECONDS 			0
-#define SIX_SECONDS 			6
-#define TWENTY_SECONDS 			20
-#define TWENTY_FIVE_SECONDS 	25
-#define THIRTY_THREE_SECONDS 	33
-#define THIRTY_FIVE_SECONDS 	35
 
 /* Variables */
 /*============================================================================*/
 
-E_PassengerBasicReminderStateMachine re_ModingSmState = FASTENED_OR_NOT_OCCUPIED_PASSENGER;
-E_PassengerReminderStateMachine re_UnfastenedAndOccupiedSmState = IDLE_UNFASTENED_AND_OCUPPIED_PASSENGER;
-E_PassengerReminderChimeStateMachine re_ChimeSmState = IDLE_CHIME_PASSENGER;
-E_PassengerReminderTellTaleStateMachine re_TelltaleSmState = FLASHING_TELLTALE_PASSENGER;
+E_PassengerBasicReminderStateMachine re_ModingSmState = FASTENED_OR_NOT_OCCUPIED_PASSENG;
+E_PassengerReminderStateMachine re_UnfastenedAndOccupiedSmState = IDLE_UNFASTENED_AND_OCUPPIED_PASSENG;
+E_PassengerReminderChimeStateMachine re_ChimeSmState = IDLE_CHIME_PASSENG;
+E_PassengerReminderTellTaleStateMachine re_TelltaleSmState = FLASHING_TELLTALE_PASSENG;
 
-S_ChimeRequest rs_Chime = {NO_CHIME_SOUND_TONE, NO_CHIME_CADENCE, NO_CHIME_REPETITIONS, NO_CHIME_DUTY_CYCLE};
-S_ChimeRequest *rps_Chime = &rs_Chime;
-
-S_Reminder rs_PassengerReminder = {INDICATION_ON_FALSE, NO_INDICATION_DC, NO_INDICATION_PERIOD, CHIME_OFF};
+S_Reminder rs_PassengerReminder = {{INDICATION_ON_FALSE, NO_INDICATION_DC, NO_INDICATION_PERIOD}, CHIME_OFF};
 S_Reminder *rps_PassengerReminder = &rs_PassengerReminder;
 
-T_UBYTE rub_PowerUpCounter = ZERO;
 
 /* Private functions prototypes */
 /*============================================================================*/
@@ -90,6 +84,7 @@ void passengerremsm_ConfigContinuousIndication(void);
 void passengerremsm_ConfigFlashingIndication(void);
 void passengerremsm_ConfigNoChime(void);
 void passengerremsm_ConfigType1Chime(void);
+void passengerremsm_SetResetConfiguration(void);
 
 /* Inline functions */
 /*============================================================================*/
@@ -110,7 +105,7 @@ void passengerremsm_ConfigType1Chime(void);
  **************************************************************/
 void passengerremsm_PassengerFastenedOrNotOccupiedState(void){
   if((rps_PassengerSeatBeltSensor-> re_SensorValidStatus == BS_UNBUCKLED) && (rps_PassengerSeatSensor-> re_SensorValidStatus == OS_OCUPPIED))
-	  re_ModingSmState = UNFASTENED_AND_OCCUPIED_PASSENGER;
+	  re_ModingSmState = UNFASTENED_AND_OCCUPIED_PASSENG;
 }
 
 /**************************************************************
@@ -126,16 +121,29 @@ void passengerremsm_PassengerUnfastenedAndOccupiedState(void){
 //  rub_PowerUpCounter++;
 
   if((rps_PassengerSeatBeltSensor-> re_SensorValidStatus == BS_BUCKLED) || (rps_PassengerSeatSensor-> re_SensorValidStatus == OS_UNOCUPPIED)){
-	  re_ModingSmState = FASTENED_OR_NOT_OCCUPIED_PASSENGER;
+	  re_ModingSmState = FASTENED_OR_NOT_OCCUPIED_PASSENG;
 
-	  /*SM Reset*/
-	  re_UnfastenedAndOccupiedSmState = NO_CHIME_AND_CONTINUOUS_INDICATION_PASSENGER;
-	  re_ChimeSmState = CHIME_TYPE1_PASSENGER;
-	  re_TelltaleSmState = FLASHING_TELLTALE_PASSENGER;
+	  passengerremsm_SetResetConfiguration();			/* SM Reset */
   }
   else{
 	  passengerremsm_UnfastenedAndOccupiedStateMachine();
   }
+}
+
+/**************************************************************
+ *  Name                 : passengerremsm_SetResetConfiguration
+ *  Description          : Sets the Reset Configuration of the Basic Reminder State Machine
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void passengerremsm_SetResetConfiguration(void){
+  re_UnfastenedAndOccupiedSmState = IDLE_UNFASTENED_AND_OCUPPIED_PASSENG;
+  re_ChimeSmState = IDLE_CHIME_PASSENG;
+  re_TelltaleSmState = FLASHING_TELLTALE_PASSENG;
+
+  passengerremsm_ConfigNoChime();
+  passengerremsm_ConfigNoIndication();
 }
 
 /**************************************************************
@@ -147,9 +155,9 @@ void passengerremsm_PassengerUnfastenedAndOccupiedState(void){
  **************************************************************/
 void passengerremsm_PassengerIdleUnfAndOccState(void){
   if(rub_PowerUpCounter <= TWENTY_FIVE_SECONDS)
-    re_UnfastenedAndOccupiedSmState = NO_CHIME_AND_CONTINUOUS_INDICATION_PASSENGER;
+    re_UnfastenedAndOccupiedSmState = NO_CHIME_AND_CONTINUOUS_INDICATION_PASSENG;
   else
-    re_UnfastenedAndOccupiedSmState = BASIC_INDICATION_PASSENGER;
+    re_UnfastenedAndOccupiedSmState = BASIC_INDICATION_PASSENG;
   passengerremsm_UnfastenedAndOccupiedStateMachine();
 }
 
@@ -165,7 +173,7 @@ void passengerremsm_PassengerNoChimeAndContinuousIndicationState(void){
   passengerremsm_ConfigNoChime();
 
   if(rub_PowerUpCounter > TWENTY_FIVE_SECONDS)
-    re_UnfastenedAndOccupiedSmState = BASIC_INDICATION_PASSENGER;
+    re_UnfastenedAndOccupiedSmState = BASIC_INDICATION_PASSENG;
 }
 
 /**************************************************************
@@ -176,10 +184,10 @@ void passengerremsm_PassengerNoChimeAndContinuousIndicationState(void){
  *  Critical/explanation : No
  **************************************************************/
 void passengerremsm_ConfigNoChime(void){
-  rps_Chime->rub_SoundTone = NO_CHIME_SOUND_TONE;
-  rps_Chime->rub_Cadence = NO_CHIME_CADENCE;
-  rps_Chime->rub_Repetitions = NO_CHIME_REPETITIONS;
-  rps_Chime->rub_DutyCycle = NO_CHIME_DUTY_CYCLE;
+//  rps_Chime->rub_SoundTone = NO_CHIME_SOUND_TONE;
+// rps_Chime->rub_Cadence = NO_CHIME_CADENCE;
+//  rps_Chime->rub_Repetitions = NO_CHIME_REPETITIONS;
+//  rps_Chime->rub_DutyCycle = NO_CHIME_DUTY_CYCLE;
   rps_PassengerReminder->rub_ChimeStatus = CHIME_OFF;
 }
 
@@ -258,9 +266,9 @@ void passengerremsm_PassengerBasicIndicationState(void){
  **************************************************************/
 void passengerremsm_PassengerIdleChimeState(void){
   if(rub_PowerUpCounter <= THIRTY_THREE_SECONDS)
- 	  re_ChimeSmState = CHIME_TYPE1_PASSENGER;
+ 	  re_ChimeSmState = CHIME_TYPE1_PASSENG;
   else
-	  re_ChimeSmState = NO_CHIME_PASSENGER;
+	  re_ChimeSmState = NO_CHIME_PASSENG;
   passengerremsm_ChimeStateMachine();
 }
 
@@ -277,7 +285,7 @@ void passengerremsm_PassengerChimeType1State(void){
   lub_PassengerChimeCounter++;
   if(lub_PassengerChimeCounter >= SIX_SECONDS){
 	  lub_PassengerChimeCounter = 0;
-	  re_ChimeSmState = NO_CHIME_PASSENGER;
+	  re_ChimeSmState = NO_CHIME_PASSENG;
   }
   else{
 	  passengerremsm_ConfigType1Chime();
@@ -308,7 +316,7 @@ void passengerremsm_PassengerFlashingTelltaleState(void){
   lub_PassengerTelltaleCounter++;
   if(lub_PassengerTelltaleCounter >= TWENTY_SECONDS){
 	  lub_PassengerTelltaleCounter = 0;
-	  re_TelltaleSmState = CONTINUOUS_TELLTALE_PASSENGER;
+	  re_TelltaleSmState = CONTINUOUS_TELLTALE_PASSENG;
   }
   else{
 	  passengerremsm_ConfigFlashingIndication();
@@ -328,7 +336,7 @@ void passengerremsm_PassengerContinuousTelltaleState(void){
   lub_PassengerTelltaleTimeOutCounter++;
   if(lub_PassengerTelltaleTimeOutCounter >= THIRTY_FIVE_SECONDS){
 	  lub_PassengerTelltaleTimeOutCounter = 0;
-	  re_TelltaleSmState = NO_INDICATION_TELLTALE_PASSENGER;
+	  re_TelltaleSmState = NO_INDICATION_TELLTALE_PASSENG;
   }
   else{
 	  passengerremsm_ConfigContinuousIndication();
@@ -360,11 +368,11 @@ void passengerremsm_PassengerNoIndicationTelltaleState(void){
  **************************************************************/
 void passengerremsm_ModingStateMachine(void){
   switch(re_ModingSmState){
-    case FASTENED_OR_NOT_OCCUPIED_PASSENGER:
+    case FASTENED_OR_NOT_OCCUPIED_PASSENG:
       passengerremsm_PassengerFastenedOrNotOccupiedState();
       break;
 
-    case UNFASTENED_AND_OCCUPIED_PASSENGER:
+    case UNFASTENED_AND_OCCUPIED_PASSENG:
       passengerremsm_PassengerUnfastenedAndOccupiedState();
       break;
 
@@ -382,15 +390,15 @@ void passengerremsm_ModingStateMachine(void){
  **************************************************************/
 void passengerremsm_UnfastenedAndOccupiedStateMachine(void){
   switch(re_UnfastenedAndOccupiedSmState){
-    case IDLE_UNFASTENED_AND_OCUPPIED_PASSENGER:
+    case IDLE_UNFASTENED_AND_OCUPPIED_PASSENG:
     	passengerremsm_PassengerIdleUnfAndOccState();
     	break;
 
-    case NO_CHIME_AND_CONTINUOUS_INDICATION_PASSENGER:
+    case NO_CHIME_AND_CONTINUOUS_INDICATION_PASSENG:
       passengerremsm_PassengerNoChimeAndContinuousIndicationState();
       break;
 
-    case BASIC_INDICATION_PASSENGER:
+    case BASIC_INDICATION_PASSENG:
       passengerremsm_PassengerBasicIndicationState();
       break;
 
@@ -408,15 +416,15 @@ void passengerremsm_UnfastenedAndOccupiedStateMachine(void){
  **************************************************************/
 void passengerremsm_ChimeStateMachine(void){
   switch(re_ChimeSmState){
-    case IDLE_CHIME_PASSENGER:
+    case IDLE_CHIME_PASSENG:
     	passengerremsm_PassengerIdleChimeState();
     break;
 
-    case CHIME_TYPE1_PASSENGER:
+    case CHIME_TYPE1_PASSENG:
       passengerremsm_PassengerChimeType1State();
       break;
 
-    case NO_CHIME_PASSENGER:
+    case NO_CHIME_PASSENG:
       passengerremsm_PassengerNoChimeState();
       break;
 
@@ -434,15 +442,15 @@ void passengerremsm_ChimeStateMachine(void){
  **************************************************************/
 void passengerremsm_TelltaleMachine(void){
   switch(re_TelltaleSmState){
-    case FLASHING_TELLTALE_PASSENGER:
+    case FLASHING_TELLTALE_PASSENG:
       passengerremsm_PassengerFlashingTelltaleState();
       break;
 
-    case CONTINUOUS_TELLTALE_PASSENGER:
+    case CONTINUOUS_TELLTALE_PASSENG:
       passengerremsm_PassengerContinuousTelltaleState();
       break;
 
-    case NO_INDICATION_TELLTALE_PASSENGER:
+    case NO_INDICATION_TELLTALE_PASSENG:
       passengerremsm_PassengerNoIndicationTelltaleState();
       break;
 

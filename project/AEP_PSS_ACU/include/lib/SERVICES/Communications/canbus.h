@@ -4,14 +4,14 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: passengerremsm.h $
+ * $Source: canbus.h $
  * $Revision: version 2 $
  * $Author: Habib Apez $
  * $Date: 2017-12-17  $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \passengerremsm.h
+/** \canbus.h
     Header file for state machine of the passenger reminder. Located at HAL.
 */
 /*============================================================================*/
@@ -33,60 +33,32 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
-/* Habib Apez          |          2         |   Modified for its use with     */
-/*                     |                    |   remindercommon.c              */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: passengerremsm.h  $
+ * $Log: canbus.h  $
   ============================================================================*/
-#ifndef __PASSENGRRMSM_H
-#define __PASSENGRRMSM_H
+#ifndef __CANBUS_H
+#define __CANBUS_H
 
 /* Includes */
 /*============================================================================*/
-#include "HAL\sensors.h"
-#include "APP\remindercommon.h"
+#include "Common\Std_Types.h"
 
 /* Constants and types */
 /*============================================================================*/
-typedef enum{
-  FASTENED_OR_NOT_OCCUPIED_PASSENG,
-  UNFASTENED_AND_OCCUPIED_PASSENG,
-}E_PassengerBasicReminderStateMachine;
-
-typedef enum{
-  IDLE_UNFASTENED_AND_OCUPPIED_PASSENG,
-  NO_CHIME_AND_CONTINUOUS_INDICATION_PASSENG,
-  BASIC_INDICATION_PASSENG,
-}E_PassengerReminderStateMachine;
-
-typedef enum{
-  IDLE_CHIME_PASSENG,
-  CHIME_TYPE1_PASSENG,
-  NO_CHIME_PASSENG,
-}E_PassengerReminderChimeStateMachine;
-
-typedef enum{
-  FLASHING_TELLTALE_PASSENG,
-  CONTINUOUS_TELLTALE_PASSENG,
-  NO_INDICATION_TELLTALE_PASSENG
-}E_PassengerReminderTellTaleStateMachine;
+#define POWER_UP_CONTER_RESET	0
+#define TWO_HUNDRED_MS_TASK   	10
+#define ZERO_SECONDS_TASK		0
 
 /* Exported Variables */
 /*============================================================================*/
+T_UBYTE rub_PowerUpCounter;
 
 /* Exported functions prototypes */
 /*============================================================================*/
-void passengerremsm_ModingStateMachine(void);
-void passengerremsm_UnfastenedAndOccupiedStateMachine(void);
-void passengerremsm_ChimeStateMachine(void);
-void passengerremsm_TelltaleMachine(void);
-
-T_UBYTE passengerremsm_PassengerGetIndicatorStatus(void);
-T_UBYTE passengerremsm_PassengerGetIndicationDutyCycle(void);
-T_UBYTE passengerremsm_PassengerGetIndicationPeriod(void);
-T_UBYTE passengerremsm_PassengerGetChimeStatus(void);
+void canbus_SendCANMessages(void);
+void canbus_ReadEngRPMMessage(void);
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */
