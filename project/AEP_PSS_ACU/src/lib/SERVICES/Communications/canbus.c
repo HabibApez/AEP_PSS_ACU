@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: canbus.c $
- * $Revision: version 1 $
+ * $Revision: version 2 $
  * $Author: Habib Apez $
- * $Date: 2017-12- 17 $
+ * $Date: 2017-12- 18 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -32,6 +32,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          1         |   Engine Status function added  */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -49,6 +50,8 @@
 
 /* Constants and types  */
 /*============================================================================*/
+#define ZERO_SECONDS_TASK		0
+#define TWO_HUNDRED_MS_TASK   	10
 
 /* Variables */
 /*============================================================================*/
@@ -157,6 +160,17 @@ void canbus_SendCANMessages(void){
  else{
 	  // Do nothing
  }
+}
+
+/**************************************************************
+ *  Name                 : canbus_GetEngStatus
+ *  Description          : Return the Engine Status
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE canbus_GetEngStatus(void){
+  return rub_EngineStatus;
 }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

@@ -104,7 +104,7 @@ void passengerremsm_SetResetConfiguration(void);
  *  Critical/explanation : No
  **************************************************************/
 void passengerremsm_PassengerFastenedOrNotOccupiedState(void){
-  if((rps_PassengerSeatBeltSensor-> re_SensorValidStatus == BS_UNBUCKLED) && (rps_PassengerSeatSensor-> re_SensorValidStatus == OS_OCUPPIED))
+  if((rps_PassengerSeatBeltSensor-> re_SensorValidStatus == SBS_UNBUCKLED) && (rps_PassengerSeatSensor-> re_SensorValidStatus == OS_OCUPPIED))
 	  re_ModingSmState = UNFASTENED_AND_OCCUPIED_PASSENG;
 }
 
@@ -120,7 +120,7 @@ void passengerremsm_PassengerUnfastenedAndOccupiedState(void){
 
 //  rub_PowerUpCounter++;
 
-  if((rps_PassengerSeatBeltSensor-> re_SensorValidStatus == BS_BUCKLED) || (rps_PassengerSeatSensor-> re_SensorValidStatus == OS_UNOCUPPIED)){
+  if((rps_PassengerSeatBeltSensor-> re_SensorValidStatus == SBS_BUCKLED) || (rps_PassengerSeatSensor-> re_SensorValidStatus == OS_UNOCUPPIED)){
 	  re_ModingSmState = FASTENED_OR_NOT_OCCUPIED_PASSENG;
 
 	  passengerremsm_SetResetConfiguration();			/* SM Reset */

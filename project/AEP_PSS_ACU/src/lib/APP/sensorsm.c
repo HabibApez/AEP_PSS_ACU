@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: sensorsm.c $
- * $Revision: version 1 $
+ * $Revision: version 2 $
  * $Author: Habib Apez $
- * $Date: 2017-12-08 $
+ * $Date: 2017-12-18 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -33,6 +33,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Habib Apez          |          2         |   Indicator functions added     */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -44,6 +45,7 @@
 /*============================================================================*/
 #include "APP\sensorsm.h"
 #include "HAL\leds.h"
+#include "HAL\seatindicators.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -71,6 +73,10 @@ void sensorsm_PassengerSBValidationState(void);
 void sensorsm_PassengerSValidationState(void);
 void sensorsm_UpdateSBStatus(S_SeatBeltSensor *lps_SSensor);
 void sensorsm_UpdateSStatus(S_OcuppancySeatSensor *lps_SSensor);
+
+void sensorsm_UpdateSBDriverIndicators(void);
+void sensorsm_UpdateSBPassengerIndicators(void);
+void sensorsm_UpdateOSPassengerIndicators(void);
 
 /* Inline functions */
 /*============================================================================*/
@@ -114,32 +120,6 @@ void sensorsm_IdleState(void){
   	  re_SensorSmState = PASSENGER_SEAT_VALIDATION;
   	  rub_PSTimeCounter = ZERO_MS;
   	  }
-
-/*
-  if(rub_DSBTimeCounter == TWO_HUNDRED_SENSOR_MS){
-    re_SensorSmState = DRIVER_SEAT_BELT_VALIDATION;
-    rub_DSBTimeCounter = ZERO_MS;
-  }
-  else{
-    rub_DSBTimeCounter++;
-
-	if(rub_PSBTimeCounter == TWO_HUNDRED_SENSOR_MS){
-	re_SensorSmState = PASSENGER_SEAT_BELT_VALIDATION;
-	rub_PSBTimeCounter = ZERO_MS;
-	}
-	else{
-	  rub_PSBTimeCounter++;
-
-	  if(rub_PSTimeCounter == FIVE_HUNDRED_SENSOR_MS){
-	  re_SensorSmState = PASSENGER_SEAT_VALIDATION;
-	  rub_PSTimeCounter = ZERO_MS;
-	  }
-	  else
-	    rub_PSTimeCounter++;
-    }
-  }
-
-  */
 }
 
 /**************************************************************
@@ -160,6 +140,7 @@ void sensorsm_DriverSBValidationState(void){
 	if(lub_DSBFilterCounter == FIVE_TIMES){
 		rps_DriverSeatBeltSensor->re_SensorValidStatus = rps_DriverSeatBeltSensor-> re_SensorCurrentStatus;
 		lub_DSBFilterCounter = ZERO_TIMES;
+		sensorsm_UpdateSBDriverIndicators();
 	}
   }
   else{
@@ -187,6 +168,7 @@ void sensorsm_PassengerSBValidationState(void){
 	if(lub_PSBFilterCounter == FIVE_TIMES){
 		rps_PassengerSeatBeltSensor->re_SensorValidStatus = rps_PassengerSeatBeltSensor-> re_SensorCurrentStatus;
 		lub_PSBFilterCounter = ZERO_TIMES;
+		sensorsm_UpdateSBPassengerIndicators();
 	}
   }
   else{
@@ -215,6 +197,7 @@ void sensorsm_PassengerSValidationState(void){
 	if(lub_PSFilterCounter == SIX_TIMES){
 		rps_PassengerSeatSensor->re_SensorValidStatus = rps_PassengerSeatSensor-> re_SensorCurrentStatus;
 		lub_PSFilterCounter = ZERO_TIMES;
+		sensorsm_UpdateOSPassengerIndicators();
 	}
   }
   else{
@@ -235,19 +218,19 @@ void sensorsm_UpdateSBStatus(S_SeatBeltSensor *lps_SBSensor){
   T_ULONG lul_SensorVoltage = lps_SBSensor-> rul_SensorReading;
 
   if(lul_SensorVoltage >2000){			/* If voltage > 20V */
-    lps_SBSensor-> re_SensorCurrentStatus = BS_FAULTY;
+    lps_SBSensor-> re_SensorCurrentStatus = SBS_FAULTY;
   }
   else if (lul_SensorVoltage > 1200) { 	/* If voltage > 12V */
-    lps_SBSensor-> re_SensorCurrentStatus = BS_BUCKLED;
+    lps_SBSensor-> re_SensorCurrentStatus = SBS_BUCKLED;
   }
   else if (lul_SensorVoltage >1000) { 	/* If voltage > 10v */
-	lps_SBSensor-> re_SensorCurrentStatus = BS_UNDETERMINED;
+	lps_SBSensor-> re_SensorCurrentStatus = SBS_UNDETERMINED;
   }
   else if (lul_SensorVoltage >200) { 	/* If voltage > 2v */
-	lps_SBSensor-> re_SensorCurrentStatus = BS_UNBUCKLED;
+	lps_SBSensor-> re_SensorCurrentStatus = SBS_UNBUCKLED;
   }
   else {
-	lps_SBSensor-> re_SensorCurrentStatus = BS_FAULTY;
+	lps_SBSensor-> re_SensorCurrentStatus = SBS_FAULTY;
   }
 }
 
@@ -262,7 +245,7 @@ void sensorsm_UpdateSStatus(S_OcuppancySeatSensor *lps_SSensor){
   T_ULONG lul_SensorVoltage = lps_SSensor-> rul_SensorReading;
 
   if(lul_SensorVoltage >2000){			/* If voltage > 20V */
-    lps_SSensor-> re_SensorCurrentStatus = BS_FAULTY;
+    lps_SSensor-> re_SensorCurrentStatus = OS_FAULTY;
   }
   else if (lul_SensorVoltage > 1200) { 	/* If voltage > 12V */
     lps_SSensor-> re_SensorCurrentStatus = OS_UNOCUPPIED;
@@ -275,6 +258,142 @@ void sensorsm_UpdateSStatus(S_OcuppancySeatSensor *lps_SSensor){
   }
   else {
 	lps_SSensor-> re_SensorCurrentStatus = OS_FAULTY;
+  }
+}
+
+/**************************************************************
+ *  Name                 : sensorsm_UpdateSBDriverIndicators
+ *  Description          : Updates the Driver Seat Belt Sensor Indicators
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void sensorsm_UpdateSBDriverIndicators(void){
+  switch(rps_DriverSeatBeltSensor->re_SensorValidStatus){
+  case SBS_FAULTY:
+	  seatindicators_TurnOnIndicator(rps_PTD, 1<<DRIVER_SBS_UP_FAULTY_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<DRIVER_SBS_BUCLKED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<DRIVER_SBS_UNDETERMINED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTA, 1<<DRIVER_SBS_UNBUCKLED_PIN);
+	  seatindicators_TurnOnIndicator(rps_PTE, 1<<DRIVER_SBS_DOWN_FAULTY_PIN);
+	break;
+
+  case SBS_BUCKLED:
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<DRIVER_SBS_UP_FAULTY_PIN);
+	  seatindicators_TurnOnIndicator(rps_PTD, 1<<DRIVER_SBS_BUCLKED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<DRIVER_SBS_UNDETERMINED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTA, 1<<DRIVER_SBS_UNBUCKLED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTE, 1<<DRIVER_SBS_DOWN_FAULTY_PIN);
+	break;
+
+  case SBS_UNDETERMINED:
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<DRIVER_SBS_UP_FAULTY_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<DRIVER_SBS_BUCLKED_PIN);
+	  seatindicators_TurnOnIndicator(rps_PTD, 1<<DRIVER_SBS_UNDETERMINED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTA, 1<<DRIVER_SBS_UNBUCKLED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTE, 1<<DRIVER_SBS_DOWN_FAULTY_PIN);
+	break;
+
+  case SBS_UNBUCKLED:
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<DRIVER_SBS_UP_FAULTY_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<DRIVER_SBS_BUCLKED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<DRIVER_SBS_UNDETERMINED_PIN);
+	  seatindicators_TurnOnIndicator(rps_PTA, 1<<DRIVER_SBS_UNBUCKLED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTE, 1<<DRIVER_SBS_DOWN_FAULTY_PIN);
+	break;
+
+  default:
+    break;
+  }
+}
+
+/**************************************************************
+ *  Name                 : sensorsm_UpdateSBPassengerIndicators
+ *  Description          : Updates the Passenger Seat Belt Sensor Indicators
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void sensorsm_UpdateSBPassengerIndicators(void){
+  switch(rps_PassengerSeatBeltSensor->re_SensorValidStatus){
+  case SBS_FAULTY:
+	  seatindicators_TurnOnIndicator(rps_PTD, 1<<PASSENG_SBS_UP_FAULTY_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<PASSENG_SBS_BUCLKED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTC, 1<<PASSENG_SBS_UNDETERMINED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTC, 1<<PASSENG_SBS_UNBUCKLED_PIN);
+	  seatindicators_TurnOnIndicator(rps_PTB, 1<<PASSENG_SBS_DOWN_FAULTY_PIN);
+	break;
+
+  case SBS_BUCKLED:
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<PASSENG_SBS_UP_FAULTY_PIN);
+	  seatindicators_TurnOnIndicator(rps_PTD, 1<<PASSENG_SBS_BUCLKED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTC, 1<<PASSENG_SBS_UNDETERMINED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTC, 1<<PASSENG_SBS_UNBUCKLED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_SBS_DOWN_FAULTY_PIN);
+	break;
+
+  case SBS_UNDETERMINED:
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<PASSENG_SBS_UP_FAULTY_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<PASSENG_SBS_BUCLKED_PIN);
+	  seatindicators_TurnOnIndicator(rps_PTC, 1<<PASSENG_SBS_UNDETERMINED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTC, 1<<PASSENG_SBS_UNBUCKLED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_SBS_DOWN_FAULTY_PIN);
+	break;
+
+  case SBS_UNBUCKLED:
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<PASSENG_SBS_UP_FAULTY_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTD, 1<<PASSENG_SBS_BUCLKED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTC, 1<<PASSENG_SBS_UNDETERMINED_PIN);
+	  seatindicators_TurnOnIndicator(rps_PTC, 1<<PASSENG_SBS_UNBUCKLED_PIN);
+	  seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_SBS_DOWN_FAULTY_PIN);
+	break;
+
+  default:
+    break;
+  }
+}
+
+
+/**************************************************************
+ *  Name                 : sensorsm_UpdateOSPassengerIndicators
+ *  Description          : Updates the Passenger Occupancy Sensor Indicators
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void sensorsm_UpdateOSPassengerIndicators(void){
+  switch(rps_PassengerSeatSensor-> re_SensorCurrentStatus){
+  case OS_FAULTY:
+	seatindicators_TurnOnIndicator(rps_PTB, 1<<PASSENG_OS_UP_FAULTY_PIN);
+	seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_OS_UNOCCUPIED_PIN);
+	seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_OS_UNDETERMINED_PIN);
+	seatindicators_TurnOffIndicator(rps_PTA, 1<<PASSENG_OS_OCCUPIED_PIN);
+	seatindicators_TurnOnIndicator(rps_PTA, 1<<PASSENG_OS_DOWN_FAULTY_PIN);
+    break;
+
+  case OS_UNOCUPPIED:
+	seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_OS_UP_FAULTY_PIN);
+	seatindicators_TurnOnIndicator(rps_PTB, 1<<PASSENG_OS_UNOCCUPIED_PIN);
+	seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_OS_UNDETERMINED_PIN);
+	seatindicators_TurnOffIndicator(rps_PTA, 1<<PASSENG_OS_OCCUPIED_PIN);
+	seatindicators_TurnOffIndicator(rps_PTA, 1<<PASSENG_OS_DOWN_FAULTY_PIN);
+	break;
+
+  case OS_UNDETERMINED:
+	seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_OS_UP_FAULTY_PIN);
+	seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_OS_UNOCCUPIED_PIN);
+	seatindicators_TurnOnIndicator(rps_PTB, 1<<PASSENG_OS_UNDETERMINED_PIN);
+	seatindicators_TurnOffIndicator(rps_PTA, 1<<PASSENG_OS_OCCUPIED_PIN);
+	seatindicators_TurnOffIndicator(rps_PTA, 1<<PASSENG_OS_DOWN_FAULTY_PIN);
+    break;
+
+  case OS_OCUPPIED:
+	seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_OS_UP_FAULTY_PIN);
+	seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_OS_UNOCCUPIED_PIN);
+	seatindicators_TurnOffIndicator(rps_PTB, 1<<PASSENG_OS_UNDETERMINED_PIN);
+	seatindicators_TurnOnIndicator(rps_PTA, 1<<PASSENG_OS_OCCUPIED_PIN);
+	seatindicators_TurnOffIndicator(rps_PTA, 1<<PASSENG_OS_DOWN_FAULTY_PIN);
+    break;
   }
 }
 
@@ -293,30 +412,18 @@ void sensorsm_UpdateSStatus(S_OcuppancySeatSensor *lps_SSensor){
 void sensorsm_StateMachine(void){
   switch(re_SensorSmState){
     case SENSOR_IDLE:
-      //leds_TurnOffUpLED();
-      //leds_TurnOffDownLED();
-      //leds_TurnOffAntipinchLED();
       sensorsm_IdleState();
       break;
 
     case DRIVER_SEAT_BELT_VALIDATION:
-    	//leds_TurnOnUpLED();
-    	//leds_TurnOffDownLED();
-    	//leds_TurnOffAntipinchLED();
     	sensorsm_DriverSBValidationState();
       break;
 
     case PASSENGER_SEAT_BELT_VALIDATION:
-    	//leds_TurnOffUpLED();
-    	//leds_TurnOnDownLED();
-    	//leds_TurnOffAntipinchLED();
     	sensorsm_PassengerSBValidationState();
       break;
 
     case PASSENGER_SEAT_VALIDATION:
-    	//leds_TurnOffUpLED();
-    	//leds_TurnOffDownLED();
-    	//leds_TurnOnAntipinchLED();
     	sensorsm_PassengerSValidationState();
       break;
 

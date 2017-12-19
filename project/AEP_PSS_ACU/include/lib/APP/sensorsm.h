@@ -56,10 +56,10 @@ typedef enum{
 }E_SensorStateMachine;
 
 typedef enum{
-  BS_FAULTY,
-  BS_BUCKLED,
-  BS_UNDETERMINED,
-  BS_UNBUCKLED
+  SBS_FAULTY,
+  SBS_BUCKLED,
+  SBS_UNDETERMINED,
+  SBS_UNBUCKLED
 }E_BeltSensorState;
 
 typedef enum{
@@ -85,8 +85,8 @@ typedef struct{
 
 /* Exported Variables */
 /*============================================================================*/
-S_SeatBeltSensor rs_DriverSeatBeltSensor = {0, BS_FAULTY, BS_FAULTY, BS_FAULTY};
-S_SeatBeltSensor rs_PassengerSeatBeltSensor =  {0, BS_FAULTY, BS_FAULTY, BS_FAULTY};
+S_SeatBeltSensor rs_DriverSeatBeltSensor = {0, SBS_FAULTY, SBS_FAULTY, SBS_FAULTY};
+S_SeatBeltSensor rs_PassengerSeatBeltSensor =  {0, SBS_FAULTY, SBS_FAULTY, SBS_FAULTY};
 S_OcuppancySeatSensor rs_PassengerSeatSensor =  {0,OS_FAULTY, OS_FAULTY, OS_FAULTY};
 
 S_SeatBeltSensor *rps_DriverSeatBeltSensor = &rs_DriverSeatBeltSensor;

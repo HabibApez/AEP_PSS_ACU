@@ -98,7 +98,7 @@ void driverremsm_SetResetConfiguration(void);
  *  Critical/explanation : No
  **************************************************************/
 void driverremsm_DriverFastenedOrNotOccupiedState(void){
-  if(rps_DriverSeatBeltSensor-> re_SensorValidStatus == BS_UNBUCKLED)
+  if(rps_DriverSeatBeltSensor-> re_SensorValidStatus == SBS_UNBUCKLED)
 	  re_DriverModingSmState = UNFASTENED_DRIVER;
 }
 
@@ -114,7 +114,7 @@ void driverremsm_DriverUnfastenedAndOccupiedState(void){
 
 //  rub_PowerUpCounter++;
 
-  if(rps_DriverSeatBeltSensor-> re_SensorValidStatus == BS_BUCKLED){
+  if(rps_DriverSeatBeltSensor-> re_SensorValidStatus == SBS_BUCKLED){
 	  re_DriverModingSmState = FASTENED_DRIVER;
 
 	  driverremsm_SetResetConfiguration();			/* SM Reset */

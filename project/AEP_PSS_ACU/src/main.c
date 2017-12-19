@@ -5,9 +5,9 @@
 /*============================================================================*/
 /*!
  * $Source: main.c $
- * $Revision: version 3 $
+ * $Revision: version 8 $
  * $Author: Habib Apez $
- * $Date: 2017-12 -17 $
+ * $Date: 2017-12 -18 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -35,8 +35,12 @@
 /* Habib Apez          |          1         |   Initial version               */
 /* Habib Apez          |          2         |   Sensor Manager added to the   */
 /*                     |                    |   scheduler                     */
-/* Habib Apez          |          3         |   Passenger state machine added   */
-/* Habib Apez          |          4         |   Tx CAN msgs functions added    */
+/* Habib Apez          |          3         |   Passenger state machine added */
+/* Habib Apez          |          4         |   Tx CAN msgs functions added   */
+/* Habib Apez          |          5         |   Rx CAN msgs function added    */
+/* Habib Apez          |          6         |   Driver state machine added    */
+/* Habib Apez          |          7         |   Reminder state machine added  */
+/* Habib Apez          |          8         |   Sensor Indicators added       */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -53,6 +57,7 @@
 #include "SERVICES\Interrupts\interrupts.h"    // OK
 #include "SERVICES\Scheduler\SchM.h"           // OK
 #include "SERVICES\Scheduler\SchM_Cfg.h"       // OK
+#include "HAL\seatindicators.h"
 
 
 /* Constants and types  */
@@ -96,6 +101,7 @@ void SysTick_Handler(void){
   leds_InitBoardLeds();
   leds_InitLeds();
   sensor_InitSensors();
+  seatindicators_InitIndicators();
 
   can_InitCAN0();
 

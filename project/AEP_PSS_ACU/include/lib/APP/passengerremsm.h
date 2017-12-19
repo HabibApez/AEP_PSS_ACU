@@ -89,4 +89,6 @@ T_UBYTE passengerremsm_PassengerGetIndicationDutyCycle(void);
 T_UBYTE passengerremsm_PassengerGetIndicationPeriod(void);
 T_UBYTE passengerremsm_PassengerGetChimeStatus(void);
 
+void passengerremsm_SetResetConfiguration(void);
+
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

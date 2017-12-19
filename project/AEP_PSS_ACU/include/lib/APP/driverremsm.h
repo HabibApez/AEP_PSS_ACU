@@ -87,4 +87,6 @@ T_UBYTE driverremsm_DriverGetIndicatorStatus(void);
 T_UBYTE driverremsm_DriverGetIndicationDutyCycle(void);
 T_UBYTE driverremsm_DriverGetIndicationPeriod(void);
 T_UBYTE driverremsm_DriverGetChimeStatus(void);
+
+void driverremsm_SetResetConfiguration(void);
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

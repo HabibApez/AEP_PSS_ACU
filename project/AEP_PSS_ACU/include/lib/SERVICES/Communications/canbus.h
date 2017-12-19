@@ -7,7 +7,7 @@
  * $Source: canbus.h $
  * $Revision: version 2 $
  * $Author: Habib Apez $
- * $Date: 2017-12-17  $
+ * $Date: 2017-12-18  $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
@@ -33,7 +33,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
-/*============================================================================*/
+/* Habib Apez          |          2         |   Engine Status function added  *//*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
@@ -49,8 +49,7 @@
 /* Constants and types */
 /*============================================================================*/
 #define POWER_UP_CONTER_RESET	0
-#define TWO_HUNDRED_MS_TASK   	10
-#define ZERO_SECONDS_TASK		0
+
 
 /* Exported Variables */
 /*============================================================================*/
@@ -60,5 +59,6 @@ T_UBYTE rub_PowerUpCounter;
 /*============================================================================*/
 void canbus_SendCANMessages(void);
 void canbus_ReadEngRPMMessage(void);
+T_UBYTE canbus_GetEngStatus(void);
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */
