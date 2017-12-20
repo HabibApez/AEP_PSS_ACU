@@ -33,6 +33,7 @@
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Habib Apez          |          1         |   Initial version               */
+/* Antonio Vazquez     |          2         |   Macros' revision              */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -53,13 +54,29 @@
 
 /* Private functions prototypes */
 /*============================================================================*/
+void can_ConfigCAN0Pins(void);
 
 /* Inline functions */
 /*============================================================================*/
 
 /* Private functions */
 /*============================================================================*/
-void flexcan_ConfigCAN0Pins(void);
+/**************************************************************
+ *  Name                 : can_ConfigCAN0Pins
+ *  Description          : Configures the CAN pins
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void can_ConfigCAN0Pins(void){
+  pcc_EnablePeripheralClock(PCC_PORTE_INDEX);
+
+  io_InputPin(rps_PTE, PTE4);           /* CAN_RX */
+  port_ConfigurePinMode(rps_PORTE, PTE4, MUX_CAN_MASK);  /* MUX = CAN_RX, input filter disabled */
+
+  io_InputPin(rps_PTE, PTE5);          /* CAN_TX*/
+  port_ConfigurePinMode(rps_PORTE, PTE5, MUX_CAN_MASK);  /* MUX = CAN_TX, input filter disabled */
+}
 
 /* Exported functions */
 /*============================================================================*/
@@ -70,13 +87,13 @@ void flexcan_ConfigCAN0Pins(void);
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void can_InitCAN0(){
+void can_InitCAN0(void){
   flexcan_InitFlexCAN0();
   flexcan_DisableFlexCANModule(rps_CAN0);
-  flexcan_ConfigClock(rps_CAN0, 0x2000);
+  flexcan_ConfigClock(rps_CAN0, OSCILLATOR_CLOCK_SOURCE);
   flexcan_EnableFlexCANModule(rps_CAN0);
 
-  flexcan_ConfigControlReg(rps_CAN0, 0x00DB0006);	  /* Configure for 500 KHz bit time */
+  flexcan_ConfigControlReg(rps_CAN0, CLOCK_500KHz);	  /* Configure for 500 KHz bit time */
 													  /* Time quanta freq = 16 time quanta x 500 KHz bit time= 8MHz */
 													  /* PRESDIV+1 = Fclksrc/Ftq = 8 MHz/8 MHz = 1 */
 													  /*    so PRESDIV = 0 */
@@ -87,22 +104,22 @@ void can_InitCAN0(){
 													  /* SMP = 1: use 3 bits per CAN sample */
 													  /* CLKSRC=0 (unchanged): Fcanclk= Fosc= 8 MHz */
   flexcan_ClearMessageBuffer(rps_CAN0);
-  flexcan_ConfigGlobalAccepMask(rps_CAN0, 0x1FFFFFFF);	/* Global acceptance mask: check all ID bits */
+  flexcan_ConfigGlobalAccepMask(rps_CAN0, GLOBAL_ID_ACCEPTANCE);	/* Global acceptance mask: check all ID bits */
 
-  flexcan_ConfigMessageBuffer(rps_CAN0, RX_MSG1_BUFF, (RX_MSG1_ID<<2)<<16, 0x04000000);   	/* Msg Buf 4, word 0: Enable for reception */
+  flexcan_ConfigMessageBuffer(rps_CAN0, RX_MSG1_BUFF, ID_0x100, RECEPTION_STD_ID);   	/* Msg Buf 4, word 0: Enable for reception */
 																			/* EDL,BRS,ESI=0: CANFD not used */
 																			/* CODE=4: MB set to RX inactive */
 																			/* IDE=0: Standard ID */
 																			/* SRR, RTR, TIME STAMP = 0: not applicable */
 																			/* Msg Buf 4, word 1: Standard ID = 0x511 */
-  flexcan_ConfigMessageBuffer(rps_CAN0, RX_MSG2_BUFF, (RX_MSG2_ID<<2)<<16, 0x04000000);   	/* Msg Buf 1, word 0: Enable for reception */
+  flexcan_ConfigMessageBuffer(rps_CAN0, RX_MSG2_BUFF, ID_0x320, RECEPTION_STD_ID);   	/* Msg Buf 1, word 0: Enable for reception */
 																			/* EDL,BRS,ESI=0: CANFD not used */
 																			/* CODE=4: MB set to RX inactive */
 																			/* IDE=0: Standard ID */
 																			/* SRR, RTR, TIME STAMP = 0: not applicable */
 																			/* Msg Buf 1, word 1: Standard ID = 0x320 */
   flexcan_ValidateConfiguration(rps_CAN0);
-  flexcan_ConfigCAN0Pins();
+  can_ConfigCAN0Pins();
 }
 
 /**************************************************************
@@ -114,7 +131,7 @@ void can_InitCAN0(){
  **************************************************************/
 void can_TransmitMessageCAN0(T_UBYTE lub_MessageBuffer, T_ULONG lul_MessageId, T_ULONG *lpl_TxData){
   flexcan_ClearMessageBufferFlag(rps_CAN0, lub_MessageBuffer);
-  flexcan_TransmitMessageFlexCAN(rps_CAN0, lub_MessageBuffer, (lul_MessageId<<2)<<16, lpl_TxData);
+  flexcan_TransmitMessageFlexCAN(rps_CAN0, lub_MessageBuffer, lul_MessageId, lpl_TxData);
 }
 
 /**************************************************************
@@ -140,21 +157,6 @@ T_UBYTE can_CheckMessageArrivalCAN0(T_UBYTE lub_MessageBuffer){
   return flexcan_CheckMessageBufferRxFlag(rps_CAN0, lub_MessageBuffer);
 }
 
-/**************************************************************
- *  Name                 : flexcan_ConfigCAN0Pins
- *  Description          : Configures the CAN pins
- *  Parameters           : [void]
- *  Return               : void
- *  Critical/explanation : No
- **************************************************************/
-void flexcan_ConfigCAN0Pins(void){
-  pcc_EnablePeripheralClock(PCC_PORTE_INDEX);
 
-  io_InputPin(rps_PTE, 1<<PTE4);           /* CAN_RX */
-  port_ConfigurePinMode(rps_PORTE, PTE4, 0x00000500);  /* MUX = CAN_RX, input filter disabled */
-
-  io_InputPin(rps_PTE, 1<<PTE5);          /* CAN_TX*/
-  port_ConfigurePinMode(rps_PORTE, PTE5, 0x00000500);  /* MUX = CAN_TX, input filter disabled */
-}
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

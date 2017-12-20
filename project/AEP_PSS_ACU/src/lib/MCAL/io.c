@@ -72,7 +72,7 @@
  *  Critical/explanation : No
  **************************************************************/
 void io_InputPin(S_GPIO *lps_Port, T_ULONG lul_Pin){
-  lps_Port->rul_PDDR &= ~(lul_Pin);
+  lps_Port->rul_PDDR &= ~(1<<lul_Pin);
 }
 
 /**************************************************************
@@ -83,7 +83,7 @@ void io_InputPin(S_GPIO *lps_Port, T_ULONG lul_Pin){
  *  Critical/explanation : No
  **************************************************************/
 void io_OutputPin(S_GPIO *lps_Port, T_ULONG lul_Pin){
-  lps_Port->rul_PDDR |= lul_Pin;
+  lps_Port->rul_PDDR |= 1 << lul_Pin;
 }
 
 /**************************************************************
@@ -94,7 +94,7 @@ void io_OutputPin(S_GPIO *lps_Port, T_ULONG lul_Pin){
  *  Critical/explanation : No
  **************************************************************/
 void io_TogglePin(S_GPIO *lps_Port, T_ULONG lul_Pin){
-  lps_Port->rul_PTOR |= lul_Pin;
+  lps_Port->rul_PTOR |= 1 << lul_Pin;
 }
 
 /**************************************************************
@@ -105,23 +105,23 @@ void io_TogglePin(S_GPIO *lps_Port, T_ULONG lul_Pin){
  *  Critical/explanation : No
  **************************************************************/
 void io_SetOutput(S_GPIO *lps_Port, T_ULONG lul_Pin){
-  lps_Port->rul_PSOR |= lul_Pin;
+  lps_Port->rul_PSOR |= 1 << lul_Pin;
 }
 
 /**************************************************************
  *  Name                 : io_ClearOutput
- *  Description          : Clears an output pin 
+ *  Description          : Clears an output pin
  *  Parameters           : [S_GPIO *lps_Port, T_ULONG lul_Pin]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
 void io_ClearOutput(S_GPIO *lps_Port, T_ULONG lul_Pin){
-  lps_Port->rul_PCOR |= lul_Pin;
+  lps_Port->rul_PCOR |= 1 << lul_Pin;
 }
 
 /**************************************************************
  *  Name                 : io_GetPinData
- *  Description          : Gets data from an input pin 
+ *  Description          : Gets data from an input pin
  *  Parameters           : [S_GPIO *lps_Port, T_UBYTE lul_Pin]
  *  Return               : T_UBYTE
  *  Critical/explanation : No
@@ -129,7 +129,7 @@ void io_ClearOutput(S_GPIO *lps_Port, T_ULONG lul_Pin){
 T_UBYTE io_GetPinData(S_GPIO *lps_Port, T_UBYTE lul_Pin){
   if((lps_Port->rul_PDIR) & (1<<lul_Pin))
     return 1;
-  else 
+  else
     return 0;
 }
 

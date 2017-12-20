@@ -36,6 +36,7 @@
 /*                     |                    |   and MISRA checked             */
 /* Habib Apez          |          3         |   Function descriptions added   */
 /* Habib Apez          |          4         |   Board LED functions added     */
+/* Antonio Vazquez     |          5         |   Modification to avoid unexpected behavior*/
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -77,13 +78,13 @@ void leds_InitLeds(void){
   pcc_EnablePeripheralClock(PCC_PORTD_INDEX);
   pcc_EnablePeripheralClock(PCC_PORTE_INDEX);
 
-  io_OutputPin(rps_PTE, 1<<PTE4);          /* Up LED*/
+  io_OutputPin(rps_PTE, PTE4);          /* Up LED*/
   port_ConfigurePinMode(rps_PORTE, PTE4, 0x00000100);  /* MUX = GPIO */
 
-  io_OutputPin(rps_PTD, 1<<PTD1);          /* Down LED*/
+  io_OutputPin(rps_PTD, PTD1);          /* Down LED*/
   port_ConfigurePinMode(rps_PORTD, PTD1, 0x00000100);  /* MUX = GPIO */
 
-  io_OutputPin(rps_PTC, 1<<PTC17);          /* Antipinch LED*/
+  io_OutputPin(rps_PTC, PTC17);          /* Antipinch LED*/
   port_ConfigurePinMode(rps_PORTC, PTC17, 0x00000100);  /* MUX = GPIO */
 }
 
@@ -95,7 +96,7 @@ void leds_InitLeds(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_TurnOnUpLED(void){
-  io_SetOutput(rps_PTE, 1<<PTE4);
+  io_SetOutput(rps_PTE, PTE4);
 }
 
 /**************************************************************
@@ -106,7 +107,7 @@ void leds_TurnOnUpLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_TurnOnDownLED(void){
-  io_SetOutput(rps_PTD, 1<<PTD1);
+  io_SetOutput(rps_PTD, PTD1);
 }
 
 /**************************************************************
@@ -117,7 +118,7 @@ void leds_TurnOnDownLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_TurnOnAntipinchLED(void){
-  io_SetOutput(rps_PTC, 1<<PTC17);
+  io_SetOutput(rps_PTC, PTC17);
 }
 
 /**************************************************************
@@ -128,7 +129,7 @@ void leds_TurnOnAntipinchLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_TurnOffUpLED(void){
-  io_ClearOutput(rps_PTE, 1<<PTE4);
+  io_ClearOutput(rps_PTE, PTE4);
 }
 
 /**************************************************************
@@ -139,7 +140,7 @@ void leds_TurnOffUpLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_TurnOffDownLED(void){
-  io_ClearOutput(rps_PTD, 1<<PTD1);
+  io_ClearOutput(rps_PTD, PTD1);
 }
 
 /**************************************************************
@@ -150,7 +151,7 @@ void leds_TurnOffDownLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_TurnOffAntipinchLED(void){
-  io_ClearOutput(rps_PTC, 1<<PTC17);
+  io_ClearOutput(rps_PTC, PTC17);
 }
 
 /**************************************************************
@@ -164,17 +165,17 @@ void leds_TurnOffAntipinchLED(void){
 void leds_InitBoardLeds(void){
   pcc_EnablePeripheralClock(PCC_PORTD_INDEX);
 
-  io_OutputPin(rps_PTD, 1<<PTD0);          /*  Blue board LED*/
+  io_OutputPin(rps_PTD, PTD0);          /*  Blue board LED*/
   port_ConfigurePinMode(rps_PORTD, PTD0, 0x00000100);  /* MUX = GPIO */
-  io_SetOutput(rps_PTD, 1<<PTD0);
+  io_SetOutput(rps_PTD, PTD0);
 
-  io_OutputPin(rps_PTD, 1<<PTD15);          /* Red board LED*/
+  io_OutputPin(rps_PTD, PTD15);          /* Red board LED*/
   port_ConfigurePinMode(rps_PORTD, PTD15, 0x00000100);  /* MUX = GPIO */
-  io_SetOutput(rps_PTD, 1<<PTD15);
+  io_SetOutput(rps_PTD, PTD15);
 
-  io_OutputPin(rps_PTD, 1<<PTD16);          /* Green board LED*/
+  io_OutputPin(rps_PTD, PTD16);          /* Green board LED*/
   port_ConfigurePinMode(rps_PORTD, PTD16, 0x00000100);  /* MUX = GPIO */
-  io_SetOutput(rps_PTD, 1<<PTD16);
+  io_SetOutput(rps_PTD, PTD16);
 }
 
 /**************************************************************
@@ -185,7 +186,7 @@ void leds_InitBoardLeds(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_ToggleUpLED(void){
-  io_TogglePin(rps_PTE, 1<<PTE4);
+  io_TogglePin(rps_PTE, PTE4);
 }
 
 /**************************************************************
@@ -196,7 +197,7 @@ void leds_ToggleUpLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_ToggleDownLED(void){
-  io_TogglePin(rps_PTD, 1<<PTD1);
+  io_TogglePin(rps_PTD, PTD1);
 }
 
 
@@ -208,7 +209,7 @@ void leds_ToggleDownLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_ToggleAntipinchLED(void){
-  io_TogglePin(rps_PTC, 1<<PTC17);
+  io_TogglePin(rps_PTC, PTC17);
 }
 
 
@@ -220,7 +221,7 @@ void leds_ToggleAntipinchLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_ToggleBlueBoardLED(void){
-  io_TogglePin(rps_PTD, 1<<PTD0); 
+  io_TogglePin(rps_PTD, PTD0);
 }
 
 /**************************************************************
@@ -231,7 +232,7 @@ void leds_ToggleBlueBoardLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_ToggleRedBoardLED(void){
-  io_TogglePin(rps_PTD, 1<<PTD15); 
+  io_TogglePin(rps_PTD, PTD15);
 }
 
 /**************************************************************
@@ -242,7 +243,7 @@ void leds_ToggleRedBoardLED(void){
  *  Critical/explanation : No
  **************************************************************/
 void leds_ToggleGreenBoardLED(void){
-  io_TogglePin(rps_PTD, 1<<PTD16); 
+  io_TogglePin(rps_PTD, PTD16);
 }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */

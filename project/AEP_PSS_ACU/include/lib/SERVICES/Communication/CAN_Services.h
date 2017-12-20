@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: Communication.h $
+ * $Source: ACU_StateMachine.h $
  * $Revision: version 1 $
  * $Author: Antonio Vazquez $
- * $Date: 2017-12-08 $
+ * $Date: 2017-12-09 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \Communication
-    Header file for CAN BUS Communication. Located at HAL.
+/** \ACU_StateMachine
+    Header file for ACU_StateMachine. Located at APP.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -37,35 +37,31 @@
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: Communication.h  $
+ * $Log: ACU_StateMachine.h  $
   ============================================================================*/
-#ifndef __COMMUNICATION_H
-#define __COMMUNICATION_H
+#ifndef __ACU_H
+#define __ACU_H
 
 /* Includes */
 /*============================================================================*/
-#include "MCAL\FlexCan.h"
+#include "HAL\can.h"
 
 /* Constants and types */
 /*============================================================================*/
-#define FLAG_READY_MASK     0x00000001u
-#define FIRST_PART_OF_MSG   0u
-#define SECOND_PART_OF_MSG  1u
-#define ENABLE_TRANSMITION  0x0C000000u
-#define TRANSMISION_FRAME   0x00400000u
-#define CAN_WMBn_CS_DLC_SHIFT  16u
 
 
-#define ACTIVE				1
-#define INACTIVE			2
+enum{
+	ACU_OFF_MODE = 0,
+	ACU_ON_MODE =1,
+	ENG_ACTIVE =0x01010101,
+	ENG_INACTIVE = 0x00000000
+};
 
 /* Exported Variables */
 /*============================================================================*/
 
 /* Exported functions prototypes */
 /*============================================================================*/
-void FLEXCAN_init(S_CAN_Type *CAN);
-void FLEXCAN_transmit_msg (S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG ID_Type, const T_ULONG CAN_Id, const T_UBYTE DLC, T_ULONG *TxDATA);
-void FLEXCAN_receive_msg(S_CAN_Type *CAN, const T_UBYTE can_mb, T_ULONG *RxDATA);
+void ACU_StateMachine(void);
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

@@ -76,7 +76,7 @@
 								<option id="com.freescale.s32ds.cross.gnu.tool.c.linker.option.scriptfile.166297694" name="Script files (-T)" superClass="com.freescale.s32ds.cross.gnu.tool.c.linker.option.scriptfile" valueType="stringList">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Project_Settings/Linker_Files/S32K1xx_flash.ld&quot;"/>
 								</option>
-								<option id="gnu.c.link.option.ldflags.1277022756" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="-z muldefs" valueType="string"/>
+								<option id="gnu.c.link.option.ldflags.1277022756" name="Linker flags" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="-z muldefs" valueType="string"/>
 								<inputType id="com.freescale.s32ds.cross.gnu.tool.c.linker.inputType.scriptfile.1728143479" superClass="com.freescale.s32ds.cross.gnu.tool.c.linker.inputType.scriptfile"/>
 							</tool>
 							<tool id="com.freescale.s32ds.cross.gnu.arm.cortexm.tool.cpp.linker.1612222408" name="Standard S32DS C++ Linker" superClass="com.freescale.s32ds.cross.gnu.arm.cortexm.tool.cpp.linker">
@@ -125,9 +125,9 @@
 					<fileInfo id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.debug.1812909714.Project_Settings/Debugger/AEP_PSS_ACU_Release.launch" name="AEP_PSS_ACU_Release.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/AEP_PSS_ACU_Release.launch" toolsToInvoke=""/>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.debug.1812909714.Project_Settings/Debugger/AEP_PSS_ACU_Debug_RAM.launch" name="AEP_PSS_ACU_Debug_RAM.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/AEP_PSS_ACU_Debug_RAM.launch" toolsToInvoke=""/>
 					<sourceEntries>
+						<entry excluding="Debugger/AEP_PSS_ACU_Debug_RAM.launch|Linker_Files/S32K1xx_ram.ld|Debugger/AEP_PSS_ACU_Release.launch" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Project_Settings"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="Linker_Files/S32K1xx_ram.ld|Debugger/AEP_PSS_ACU_Debug_RAM.launch|Debugger/AEP_PSS_ACU_Release.launch" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Project_Settings"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -259,9 +259,9 @@
 					</folderInfo>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.release.2105900073.Project_Settings/Debugger/AEP_PSS_ACU_Debug_RAM.launch" name="AEP_PSS_ACU_Debug_RAM.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/AEP_PSS_ACU_Debug_RAM.launch" toolsToInvoke=""/>
 					<sourceEntries>
+						<entry excluding="Debugger/AEP_PSS_ACU_Debug_RAM.launch|Linker_Files/S32K1xx_ram.ld|Debugger/AEP_PSS_ACU_Debug.launch" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Project_Settings"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="Linker_Files/S32K1xx_ram.ld|Debugger/AEP_PSS_ACU_Debug_RAM.launch|Debugger/AEP_PSS_ACU_Debug.launch" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Project_Settings"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -393,9 +393,9 @@
 					</folderInfo>
 					<fileInfo id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.Debug_RAM.Project_Settings/Debugger/AEP_PSS_ACU_Release.launch" name="AEP_PSS_ACU_Release.launch" rcbsApplicability="disable" resourcePath="Project_Settings/Debugger/AEP_PSS_ACU_Release.launch" toolsToInvoke=""/>
 					<sourceEntries>
+						<entry excluding="Linker_Files/S32K1xx_flash.ld|Debugger/AEP_PSS_ACU_Debug.launch|Debugger/AEP_PSS_ACU_Release.launch" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Project_Settings"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="Linker_Files/S32K1xx_flash.ld|Debugger/AEP_PSS_ACU_Release.launch|Debugger/AEP_PSS_ACU_Debug.launch" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Project_Settings"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

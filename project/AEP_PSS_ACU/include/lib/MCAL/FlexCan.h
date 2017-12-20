@@ -32,7 +32,8 @@
 /*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Antonio Vazquez    |          1         |   Initial version               */
+/* Habib Apez          |          1         |   Initial version               */
+/* Antonio Vazquez     |          2        |   Macros' revision               */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -95,6 +96,34 @@
 /*CAN ID*/
 #define ID_0x511   0x14440000u
 #define ID_0x320   0x0C800000u
+
+/*NULL Mask*/
+#ifndef NULL
+#define NULL                                     0u
+#endif
+
+/**Masks*/
+#define FLEXCAN_DISABLE_MASK                      0x80000000u
+#define CAN_FROZEN_MASK                           0x1000000u
+#define CAN_FROZEN_SHIFT                          24u
+#define INCOMING_MSG_IDS_CHECK                    0xFFFFFFFFu
+#define MSG_BUFF_CFG                              0u
+#define MSG_BUFF_ID                               1u
+#define MSG_BUFF_DATA1                            2u
+#define MSG_BUFF_DATA2                            3u
+#define RESERVE_32MB                              0x0000001F
+#define CAN_NOTREADY_MASK                         0x8000000u
+#define CAN_NOTREADY_SHIFT                        27u
+#define ENABLE_PERIPHERAL_CLOCK                   0x40000000u
+#define CLEAR_FLAG_MASK                           0x00000001u
+#define FIRST_PART_OF_MSG                         0u
+#define SECOND_PART_OF_MSG	                      1u
+#define TRANSMISION_ENABLE_MASK                   0x0C400000u
+#define MSG_DLC_SIZE                              0u
+#define DLC_SHIFT                                 16u
+#define TRUE                                      1u
+#define FALSE                                     0u
+#define MSG_BUF_SIZE                              4u
 
 /** CAN - Register Layout Typedef */
 typedef struct {
@@ -164,7 +193,19 @@ struct {                                         /* offset: 0xB40, array step: 0
 
 /* Exported functions prototypes */
 /*============================================================================*/
-void FLEXCAN0_init(void);
+void flexcan_InitFlexCAN0(void);
+void flexcan_DisableFlexCANModule(S_CAN *lps_CAN);
+void flexcan_EnableFlexCANModule(S_CAN *lps_CAN);
+void flexcan_ConfigClock(S_CAN *lps_CAN, T_UWORD luw_Config1);
+void flexcan_ConfigControlReg(S_CAN *lps_CAN, T_ULONG lul_Config2);
+void flexcan_ClearMessageBuffer(S_CAN *lps_CAN);
+void flexcan_ConfigGlobalAccepMask(S_CAN *lps_CAN, T_ULONG lul_Mask);
+void flexcan_ConfigMessageBuffer(S_CAN *lps_CAN, T_UBYTE lub_MessageBoxNumber, T_ULONG lul_MessageId, T_ULONG lul_MessageConfig);
+void flexcan_ValidateConfiguration(S_CAN *lps_CAN);
+void flexcan_ClearMessageBufferFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer);
+void flexcan_TransmitMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_ULONG lul_MessageId, T_ULONG *lpul_TxData);
+void flexcan_ReceiveMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_ULONG *lpul_RxData);
+T_UBYTE flexcan_CheckMessageBufferRxFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer);
 
 
 #endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */

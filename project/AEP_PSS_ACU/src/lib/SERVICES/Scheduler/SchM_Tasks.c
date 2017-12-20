@@ -77,15 +77,7 @@ void SchM_5ms_Task(void){   /* Code Task0*/
 
 	leds_TurnOnAntipinchLED();
 	if(1 == can_CheckMessageArrivalCAN0(RX_MSG1_BUFF)){
-		  leds_TurnOnDownLED();
-		  T_ULONG rul_RxMessageData[2] = {0, 0};
-		  T_ULONG rul_TxMessageData[2] = {0, 0};
-	      can_ReceiveMessageCAN0(RX_MSG1_BUFF, rul_RxMessageData);
-	      rul_TxMessageData[0] = rul_RxMessageData[0];
-	      rul_TxMessageData[1] = rul_RxMessageData[1];
-		  //can_TransmitMessageCAN0(TX_MSG1_BUFF, TX_MSG1_ID, rul_TxMessageData);
-	      leds_TurnOffDownLED();
-
+		  ACU_StateMachine();
 	}
 	leds_TurnOffAntipinchLED();
 }

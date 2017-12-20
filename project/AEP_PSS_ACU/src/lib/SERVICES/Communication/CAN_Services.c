@@ -4,15 +4,15 @@
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: ACU_StateMachine.h $
+ * $Source: ACU_StateMachine.c $
  * $Revision: version 1 $
  * $Author: Antonio Vazquez $
  * $Date: 2017-12-09 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \ACU_StateMachine
-    Header file for ACU_StateMachine. Located at APP.
+/** \ACU_StateMachine.c
+    State Machine function for the ACU. Located at APP.
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -29,37 +29,64 @@
 /*============================================================================*/
 /*                    REUSE HISTORY - taken over from                         */
 /*============================================================================*/
-/*----------------------------------------------------------------------------*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
 /* Antonio Vazquez    |          1         |   Initial version               */
+/* Antonio V�zquez    |          2         | State Machine improved           */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
 /*
- * $Log: ACU_StateMachine.h  $
+ * $Log: ACU_StateMachine.c  $
   ============================================================================*/
-#ifndef __ACU_H
-#define __ACU_H
 
 /* Includes */
 /*============================================================================*/
-#include "HAL\Communication.h"
+#include <SERVICES/Communication/CAN_Services.h>
 
-/* Constants and types */
-/*============================================================================*/
-enum{
-	ACU_OFF_MODE = 0,
-	ACU_ON_MODE =1,
-	ENG_ACTIVE =0x01010101,
-	ENG_INACTIVE = 0x00000000
-};
-
-/* Exported Variables */
+/* Constants and types  */
 /*============================================================================*/
 
-/* Exported functions prototypes */
+/* Variables */
 /*============================================================================*/
-void ACU_StateMachine(void);
+T_UBYTE rub_ACUMode = 0;
 
-#endif  /* Notice: the file ends with a blank new line to avoid compiler warnings */
+/* Private functions prototypes */
+/*============================================================================*/
+
+/* Inline functions */
+/*============================================================================*/
+
+/* Private functions */
+/*============================================================================*/
+
+/* Exported functions */
+/*============================================================================*/
+/**************************************************************
+ *  Name                 : ACU_StateMachine
+ *  Description          : Manager the main function for the ACU module.
+ *  Parameters           : [void]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void ACU_StateMachine (void){
+  T_ULONG rx_msg_data[2];
+
+  can_ReceiveMessageCAN0(RX_MSG1_BUFF, rx_msg_data);
+
+  	  switch(rx_msg_data[FIRST_PART_OF_MSG]){
+  	  case ENG_INACTIVE:
+  		  rub_ACUMode = ACU_OFF_MODE;
+  		  leds_ToggleRedBoardLED();
+  		  break;
+  	  case ENG_ACTIVE:
+  		  rub_ACUMode = ACU_ON_MODE;
+  		  leds_ToggleBlueBoardLED();
+  		  break;
+  	  default:
+  		  break;
+}}
+
+
+
+ /* Notice: the file ends with a blank new line to avoid compiler warnings */

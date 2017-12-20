@@ -31,7 +31,8 @@
 /*============================================================================*/
 /*  Author             |        Version     | FILE VERSION (AND INSTANCE)     */
 /*----------------------------------------------------------------------------*/
-/* Antonio Vazquez    |          1         |   Initial version               */
+/* Habib Apez          |          1         |   Initial version               */
+/* Antonio Vazquez     |          2        |   Macros' revision              */
 /*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
@@ -46,6 +47,7 @@
 
 /* Constants and types  */
 /*============================================================================*/
+    /* Msg Buffer Size. (CAN 2.0AB: 2 hdr +  2 data= 4 words) */
 
 /* Variables */
 /*============================================================================*/
@@ -60,6 +62,109 @@
 /* Private functions */
 /*============================================================================*/
 
+/**************************************************************
+ *  Name                 : flexcan_DisableFlexCANModule
+ *  Description          : Disables the specified FlexCan module
+ *  Parameters           : [S_CAN *lps_CAN]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void flexcan_DisableFlexCANModule(S_CAN *lps_CAN){
+  lps_CAN->rul_MCR |= FLEXCAN_DISABLE_MASK;				/* MDIS=1: Disable module before selecting clock */
+}
+
+/**************************************************************
+ *  Name                 : flexcan_DisableFlexCANModule
+ *  Description          : Enables the specified FlexCan module
+ *  Parameters           : [S_CAN *lps_CAN]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void flexcan_EnableFlexCANModule(S_CAN *lps_CAN){
+  lps_CAN->rul_MCR &= ~FLEXCAN_DISABLE_MASK;				/* MDIS=0; Enable module config. (Sets FRZ, HALT)*/
+  while (!((lps_CAN->rul_MCR & CAN_FROZEN_MASK) >> CAN_FROZEN_SHIFT));
+                   /* Good practice: wait for FRZACK=1 on freeze mode entry/exit */
+
+}
+
+/**************************************************************
+ *  Name                 : flexcan_ConfigClock
+ *  Description          : Configures the clock
+ *  Parameters           : [S_CAN *lps_CAN, T_UWORD luw_Config1]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void flexcan_ConfigClock(S_CAN *lps_CAN, T_UWORD luw_Config1){
+  lps_CAN->rul_CTRL1 &= ~luw_Config1;
+}
+
+/**************************************************************
+ *  Name                 : flexcan_ConfigControlReg
+ *  Description          : Configures specific FlexCAN control features related to the CAN bus.
+ *  Parameters           : [S_CAN *lps_CAN, T_ULONG lul_Config2]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void flexcan_ConfigControlReg(S_CAN *lps_CAN, T_ULONG lul_Config2){
+  lps_CAN->rul_CTRL1 = lul_Config2;
+}
+
+/**************************************************************
+ *  Name                 : flexcan_ClearMessageBuffer
+ *  Description          : Clear 32 msg bufs x 4 words/msg buf = 128 words
+ *  Parameters           : [S_CAN *lps_CAN]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void flexcan_ClearMessageBuffer(S_CAN *lps_CAN){
+	T_UBYTE i=0;
+	for(i=0; i<CAN_RAMn_COUNT; i++ ) {   /* CAN: clear 32 msg bufs x 4 words/msg buf = 128 words*/
+	lps_CAN->rul_RAMn[i] = NULL;      /* Clear msg buf word */
+  }
+  for(i=0; i<CAN_RXIMR_COUNT; i++ ) {          /* In FRZ mode, init CAN0 16 msg buf filters */
+	lps_CAN->rul_RXIMR[i] = INCOMING_MSG_IDS_CHECK;  /* Check all ID bits for incoming messages */
+  }
+}
+
+/**************************************************************
+ *  Name                 : flexcan_ConfigGlobalAccepMask
+ *  Description          : Sets the global acceptance mask
+ *  Parameters           : [S_CAN *lps_CAN, T_ULONG lul_Mask]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void flexcan_ConfigGlobalAccepMask(S_CAN *lps_CAN, T_ULONG lul_Mask){
+	lps_CAN->rul_RXMGMASK = lul_Mask;  /* Global acceptance mask: check all ID bits */
+}
+
+/**************************************************************
+ *  Name                 : flexcan_ConfigMessageBuffer
+ *  Description          : Configures a Message Buffer
+ *  Parameters           : [S_CAN *lps_CAN, T_BYTE_MessageNumber, T_ULONG lul_MessageId, T_ULONG lul_MessageConfig]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void flexcan_ConfigMessageBuffer(S_CAN *lps_CAN, T_UBYTE lub_MessageBoxNumber, T_ULONG lul_MessageId, T_ULONG lul_MessageConfig){
+  lps_CAN->rul_RAMn[ lub_MessageBoxNumber*MSG_BUF_SIZE + MSG_BUFF_CFG] = lul_MessageConfig;
+  lps_CAN->rul_RAMn[ lub_MessageBoxNumber*MSG_BUF_SIZE + MSG_BUFF_ID] = lul_MessageId;
+}
+
+/**************************************************************
+ *  Name                 : flexcan_ValidateConfiguration
+ *  Description          : Wait until FlexCAN initialization is complete
+ *  Parameters           : [S_CAN *lps_CAN]
+ *  Return               : void
+ *  Critical/explanation : No
+ **************************************************************/
+void flexcan_ValidateConfiguration(S_CAN *lps_CAN){
+	lps_CAN->rul_MCR = RESERVE_32MB;       /* Negate FlexCAN 1 halt state for 32 MBs */
+	  while ((lps_CAN->rul_MCR && CAN_FROZEN_MASK) >> CAN_FROZEN_SHIFT);
+	                 /* Good practice: wait for FRZACK to clear (not in freeze mode) */
+	  while ((lps_CAN->rul_MCR && CAN_NOTREADY_MASK) >> CAN_NOTREADY_SHIFT);
+	                 /* Good practice: wait for NOTRDY to clear (module ready)  */
+}
+
+
 /* Exported functions */
 /*============================================================================*/
 /**************************************************************
@@ -69,28 +174,8 @@
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-S_CAN_Type *CANStructure;
-void ConfigureCAN (S_CAN_Type *CAN, T_UBYTE INDEX){
-  T_ULONG i=0;
-  rps_PCC->raul_PCCn[INDEX] |= PCC_PCCn_CGC_MASK;
-  CAN->rul_MCR |= CAN_MCR_MDIS_MASK;
-  CAN->rul_CTRL1 &= ~CAN_CTRL1_CLKSRC_MASK;  /* CLKSRC=0: Clock Source = oscillator (8 MHz) */
-  CAN->rul_MCR &= ~CAN_MCR_MDIS_MASK;        /* MDIS=0; Enable module config. (Sets FRZ, HALT)*/
-  while (!((CAN->rul_MCR & CAN_MCR_FRZACK_MASK) >> CAN_MCR_FRZACK_SHIFT))  {}
-                 /* Good practice: wait for FRZACK=1 on freeze mode entry/exit */
-  CAN->rul_CTRL1 = CAN_MASK_500KHz; /* Configure for 500 KHz bit time */
-                            /* Time quanta freq = 16 time quanta x 500 KHz bit time= 8MHz */
-                            /* PRESDIV+1 = Fclksrc/Ftq = 8 MHz/8 MHz = 1 */
-                            /*    so PRESDIV = 0 */
-                            /* PSEG2 = Phase_Seg2 - 1 = 4 - 1 = 3 */
-                            /* PSEG1 = PSEG2 = 3 */
-                            /* PROPSEG= Prop_Seg - 1 = 7 - 1 = 6 */
-                            /* RJW: since Phase_Seg2 >=4, RJW+1=4 so RJW=3. */
-                            /* SMP = 1: use 3 bits per CAN sample */
-                            /* CLKSRC=0 (unchanged): Fcanclk= Fosc= 8 MHz */
-  for(i=0; i<CAN_RAMn_COUNT; i++ ) {   /* CAN0: clear 32 msg bufs x 4 words/msg buf = 128 words*/
-    CAN->raul_RAMn[i] = NULL;      /* Clear msg buf word */
-  }
+void flexcan_InitFlexCAN0(){
+  rps_PCC-> raul_PCCn[PCC_FlexCAN0_INDEX] |= ENABLE_PERIPHERAL_CLOCK; 	/* CGC=1: enable clock to FlexCAN0 */
 }
 
 /**************************************************************
@@ -100,11 +185,8 @@ void ConfigureCAN (S_CAN_Type *CAN, T_UBYTE INDEX){
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void CHECK_MB_ID (S_CAN_Type *CAN, T_ULONG ID){
-  T_ULONG i=0;
-  for(i=0; i<16; i++ ) {          /* In FRZ mode, init CAN0 16 msg buf filters */
-    CAN->raul_RXIMR[i] = ID;  /* Check all ID bits for incoming messages */
-  }
+void flexcan_ClearMessageBufferFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer){
+	lps_CAN->rul_IFLAG1 = (CLEAR_FLAG_MASK << lub_MessageBuffer);       /* Clear CAN can_mb MB  flag without clearing others*/
 }
 
 /**************************************************************
@@ -114,8 +196,19 @@ void CHECK_MB_ID (S_CAN_Type *CAN, T_ULONG ID){
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void ACCEPTANCE_MB_ID (S_CAN_Type *CAN, T_ULONG ID){
-  CAN->rul_RXMGMASK = ID;
+void flexcan_TransmitMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_ULONG lul_MessageId, T_ULONG *lpul_TxData){
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA1] = lpul_TxData[FIRST_PART_OF_MSG]; /* MB word 2: data word 0 */
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA2] = lpul_TxData[SECOND_PART_OF_MSG]; /* MB word 3: data word 1 */
+
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_ID] = lul_MessageId;
+
+  lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_CFG] = TRANSMISION_ENABLE_MASK | (MSG_DLC_SIZE << DLC_SHIFT); /* MB0 word 0: */
+		                                                /* EDL,BRS,ESI=0: CANFD not used */
+		                                                /* CODE=0xC: Activate msg buf to transmit */
+		                                                /* IDE=0: Standard ID */
+		                                                /* SRR=1 Tx frame (not req'd for std ID) */
+		                                                /* RTR = 0: data, not remote tx request frame*/
+		                                                /* DLC = 8 bytes */
 }
 
 /**************************************************************
@@ -125,27 +218,25 @@ void ACCEPTANCE_MB_ID (S_CAN_Type *CAN, T_ULONG ID){
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
- void Configure_Receiver (S_CAN_Type *CAN, T_UBYTE MB, T_ULONG ID_Type, T_ULONG ID){
-   CAN->raul_RAMn[ MB*MSG_BUF_SIZE + MSG_BUF_CFG] = ENABLE_RECEPTION | ID_Type;
-   CAN->raul_RAMn[ MB*MSG_BUF_SIZE + MSG_BUF_ID] = ID;
- }
+void flexcan_ReceiveMessageFlexCAN(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer, T_ULONG *lpul_RxData){
+  T_UBYTE i = 0;
 
- /**************************************************************
-  *  Name                 : EnableCAN
-  *  Description          : Enables the CAN
-  *  Parameters           : [S_CAN_Type *CAN]
-  *  Return               : void
-  *  Critical/explanation : No
-  **************************************************************/
+  for (i=0; i<2; i++) {  /* Read two words of data (8 bytes) */
+	  lpul_RxData[i] = lps_CAN->rul_RAMn[lub_MessageBuffer*MSG_BUF_SIZE + MSG_BUFF_DATA1+ i];
+    }
+  i = lps_CAN->rul_TIMER; /* Read TIMER to unlock message buffers */
+}
 
-  void EnableCan(S_CAN_Type *CAN){
-    CAN->rul_MCR = RESERVE_32MB_MASK;       /* Negate FlexCAN 1 halt state for 32 MBs */
-    while ((CAN->rul_MCR && CAN_MCR_FRZACK_MASK) >> CAN_MCR_FRZACK_SHIFT)  {}
-                   /* Good practice: wait for FRZACK to clear (not in freeze mode) */
-    while ((CAN->rul_MCR && CAN_MCR_NOTRDY_MASK) >> CAN_MCR_NOTRDY_SHIFT)  {}
+/**************************************************************
+ *  Name                 : flexcan_CheckMessageBufferRxFlag
+ *  Description          : Checks the Rx Buffer Flag
+ *  Parameters           : [S_FlexCAN *lps_CAN, T_UBYTE lub_MessageBuffer]
+ *  Return               : T_UBYTE
+ *  Critical/explanation : No
+ **************************************************************/
+T_UBYTE flexcan_CheckMessageBufferRxFlag(S_CAN *lps_CAN, T_UBYTE lub_MessageBuffer){
+  return (lps_CAN->rul_IFLAG1 >> lub_MessageBuffer) & TRUE;
+}
 
-    rps_PORTE->raul_PCR[4] |= 0x00000500;
-    rps_PORTE->raul_PCR[5] |= 0x00000500;
-  }
 
  /* Notice: the file ends with a blank new line to avoid compiler warnings */
