@@ -47,6 +47,7 @@
 /*============================================================================*/
 #include "APP\driverremsm.h"
 #include "APP\sensorsm.h"
+#include "HAL\leds.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -64,8 +65,8 @@ S_Reminder *rps_DriverReminder = &rs_DriverReminder;
 
 /* Private functions prototypes */
 /*============================================================================*/
-void driverremsm_DriverFastenedOrNotOccupiedState(void);
-void driverremsm_DriverUnfastenedAndOccupiedState(void);
+void driverremsm_DriverFastenedState(void);
+void driverremsm_DriverUnfastenedState(void);
 void driverremsm_DriverNoChimeAndContinuousIndicationState(void);
 void driverremsm_DriverBasicIndicationState(void);
 void driverremsm_DriverChimeType1State(void);
@@ -91,32 +92,31 @@ void driverremsm_SetResetConfiguration(void);
 /******************************************************************************/
 
 /**************************************************************
- *  Name                 : driverremsm_DriverFastenedOrNotOccupiedState
+ *  Name                 : driverremsm_DriverFastenedState
  *  Description          : Defines the Passenger Fastened Or Not Occupied state
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void driverremsm_DriverFastenedOrNotOccupiedState(void){
+void driverremsm_DriverFastenedState(void){
   if(rps_DriverSeatBeltSensor-> re_SensorValidStatus == SBS_UNBUCKLED)
-	  re_DriverModingSmState = UNFASTENED_DRIVER;
+	re_DriverModingSmState = UNFASTENED_DRIVER;
+  else{
+	  // Do nothing
+  }
+
 }
 
 /**************************************************************
- *  Name                 : driverremsm_DriverUnfastenedAndOccupiedState
+ *  Name                 : driverremsm_DriverUnfastenedState
  *  Description          : Defines the Passenger Unfastened And Occupied state
  *  Parameters           : [void]
  *  Return               : void
  *  Critical/explanation : No
  **************************************************************/
-void driverremsm_DriverUnfastenedAndOccupiedState(void){
-//  static T_UBYTE lub_PSBFilterCounter = ZERO_TIMES;
-
-//  rub_PowerUpCounter++;
-
+void driverremsm_DriverUnfastenedState(void){
   if(rps_DriverSeatBeltSensor-> re_SensorValidStatus == SBS_BUCKLED){
 	  re_DriverModingSmState = FASTENED_DRIVER;
-
 	  driverremsm_SetResetConfiguration();			/* SM Reset */
   }
   else{
@@ -246,8 +246,9 @@ void driverremsm_DriverBasicIndicationState(void){
 void driverremsm_DriverIdleChimeState(void){
   if(rub_PowerUpCounter <= EIGHT_SECONDS)
  	  re_DriverChimeSmState = CHIME_TYPE1_DRIVER;
-  else
-	  re_DriverChimeSmState = NO_CHIME_DRIVER;
+  else{
+		re_DriverChimeSmState = NO_CHIME_DRIVER;
+  }
   driverremsm_ChimeStateMachine();
 }
 
@@ -348,11 +349,11 @@ void driverremsm_DriverNoIndicationTelltaleState(void){
 void driverremsm_ModingStateMachine(void){
   switch(re_DriverModingSmState){
     case FASTENED_DRIVER:
-      driverremsm_DriverFastenedOrNotOccupiedState();
+      driverremsm_DriverFastenedState();
       break;
 
     case UNFASTENED_DRIVER:
-      driverremsm_DriverUnfastenedAndOccupiedState();
+      driverremsm_DriverUnfastenedState();
       break;
 
     default:

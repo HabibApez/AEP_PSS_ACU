@@ -72,7 +72,7 @@ void sensorsm_DriverSBValidationState(void);
 void sensorsm_PassengerSBValidationState(void);
 void sensorsm_PassengerSValidationState(void);
 void sensorsm_UpdateSBStatus(S_SeatBeltSensor *lps_SSensor);
-void sensorsm_UpdateSStatus(S_OcuppancySeatSensor *lps_SSensor);
+void sensorsm_UpdateSStatus(S_OccupancySeatSensor *lps_SSensor);
 
 void sensorsm_UpdateSBDriverIndicators(void);
 void sensorsm_UpdateSBPassengerIndicators(void);
@@ -241,7 +241,7 @@ void sensorsm_UpdateSBStatus(S_SeatBeltSensor *lps_SBSensor){
  *  Return               : E_OccupancySensorState
  *  Critical/explanation : No
  **************************************************************/
-void sensorsm_UpdateSStatus(S_OcuppancySeatSensor *lps_SSensor){
+void sensorsm_UpdateSStatus(S_OccupancySeatSensor *lps_SSensor){
   T_ULONG lul_SensorVoltage = lps_SSensor-> rul_SensorReading;
 
   if(lul_SensorVoltage >2000){			/* If voltage > 20V */

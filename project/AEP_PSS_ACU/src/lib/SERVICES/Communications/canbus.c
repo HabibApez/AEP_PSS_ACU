@@ -138,6 +138,8 @@ void canbus_ReadEngRPMMessage(void){
     rub_EngineStatus = (rul_RxMessageData[0] & 0x0000FF00) >> 8;
     if(0 == rub_EngineStatus)
       rub_PowerUpCounter = POWER_UP_CONTER_RESET;
+    else
+  	  leds_TurnOnUpLED();
   }
 }
 

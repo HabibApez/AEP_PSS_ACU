@@ -81,17 +81,17 @@ typedef struct{
   E_OccupancySensorState re_SensorCurrentStatus;
   E_OccupancySensorState re_SensorPreviousStatus;
   E_OccupancySensorState re_SensorValidStatus;
-} S_OcuppancySeatSensor;
+} S_OccupancySeatSensor;
 
 /* Exported Variables */
 /*============================================================================*/
 S_SeatBeltSensor rs_DriverSeatBeltSensor = {0, SBS_FAULTY, SBS_FAULTY, SBS_FAULTY};
 S_SeatBeltSensor rs_PassengerSeatBeltSensor =  {0, SBS_FAULTY, SBS_FAULTY, SBS_FAULTY};
-S_OcuppancySeatSensor rs_PassengerSeatSensor =  {0,OS_FAULTY, OS_FAULTY, OS_FAULTY};
+S_OccupancySeatSensor rs_PassengerSeatSensor =  {0,OS_FAULTY, OS_FAULTY, OS_FAULTY};
 
 S_SeatBeltSensor *rps_DriverSeatBeltSensor = &rs_DriverSeatBeltSensor;
 S_SeatBeltSensor *rps_PassengerSeatBeltSensor = &rs_PassengerSeatBeltSensor;
-S_OcuppancySeatSensor *rps_PassengerSeatSensor = &rs_PassengerSeatSensor;
+S_OccupancySeatSensor *rps_PassengerSeatSensor = &rs_PassengerSeatSensor;
 
 
 /* Exported functions prototypes */

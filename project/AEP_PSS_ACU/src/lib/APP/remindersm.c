@@ -47,6 +47,7 @@
 #include "APP\driverremsm.h"
 #include "APP\passengerremsm.h"
 #include "SERVICES\Communications\canbus.h"
+#include "HAL\leds.h"
 
 /* Constants and types  */
 /*============================================================================*/
@@ -79,8 +80,9 @@ void remindersm_RunDriverAndPassengerReminderSM(void){
   if(lub_OneSecondCounter >= ONE_SECOND_TASK){
 	  lub_OneSecondCounter = ZERO_SECONDS_TASK;
 
-	  if(1 == canbus_GetEngStatus())
+	  if(1 == canbus_GetEngStatus()){
 		  rub_PowerUpCounter++;
+	  }
 	  else
 		  rub_PowerUpCounter = 0;
 
